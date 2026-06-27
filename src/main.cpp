@@ -4,14 +4,22 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#include <cornbreadlib/primitives.h>
+#include <cornbreadlib/vertexbuffer.h>
+#include <cornbreadlib/shaders.h>
+#include "entity.h"
 
 using namespace std;
 
-unsigned int WIDTH = 1200;
-unsigned int HEIGHT = 800;
-float DeltaTime, LastFrame;
+int WIDTH = 1200;
+int HEIGHT = 800;
+double DeltaTime, LastFrame;
 unsigned int FPSCounter, ShownFPS;
 int FrameIndex = 0;
+
+Player mainPlayer(glm::vec2(WIDTH / 2.0f, HEIGHT / 2.0f), 0.0f, glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(200.0f, 200.0f));
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     WIDTH = width;
@@ -20,6 +28,14 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
 }
 
 void processInput(GLFWwindow *window) {
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        mainPlayer.Velocity.y = 200.0;
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        mainPlayer.Velocity.y = -200.0;
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        mainPlayer.Velocity.x = -200.0;
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        mainPlayer.Velocity.x = 200.0;
 }
 
 float LastX = -1.0, LastY = -1.0;
@@ -58,12 +74,12 @@ int main() {
     GLFWvidmode *mode = const_cast<GLFWvidmode*>(glfwGetVideoMode(monitor));
     glfwSetWindowPos(window, (mode->width - WIDTH)/2, (mode->height - HEIGHT)/2);
 
-    //glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
-    //glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);  
+    glfwSetCursorPosCallback(window, mouseCallback);
 
-    //glfwSetScrollCallback(window, scrollCallback);
+    glfwSetScrollCallback(window, scrollCallback);
 
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
         cerr << "GLAD initialization failure\n";
@@ -71,10 +87,50 @@ int main() {
         return 1;
     }
 
-    while(!glfwWindowShouldClose(window)) {
+    
+    VertexBuffer mainVBO(quadData, sizeof(quadData), GL_STATIC_DRAW);
+    mainVBO.addAttribute(0, 2, 2, GL_FLOAT, sizeof(float), 0);
+
+    Shader mainShader("src/shaders/main.vert", "src/shaders/main.frag");
+
+    while(!glfwWindowShouldClose(window)) { 
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        double currentframe = glfwGetTime();
+        DeltaTime = currentframe - LastFrame;
+        if (floor(currentframe) != floor(LastFrame)) {
+            stringstream titlestring;
+            titlestring << "Cornbread Program (FPS: " << FPSCounter << ")";
+            glfwSetWindowTitle(window, titlestring.str().c_str()); 
+            FPSCounter = 0;
+        }
+        LastFrame = currentframe;
+
         glfwPollEvents();
         processInput(window);
+
+        mainPlayer.VeloUpdate(DeltaTime);
+
+        mainShader.use();
+        glm::mat4 Model = mainPlayer.GetTransformMatrix();
+        mainShader.setMat4("model", Model);
+        //std::cout << "Model matrix:\n" << glm::to_string(Model) << std::endl;
+
+        glm::mat4 View = glm::mat4(1.0f);
+        mainShader.setMat4("view", View);
+
+        glm::mat4 Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -1.0f, 1.0f);
+        mainShader.setMat4("projection", Projection);
+        //cout << "Projection matrix:\n" << glm::to_string(Projection) << endl;
+
+        mainVBO.bind();
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
         glfwSwapBuffers(window);
+
+        FPSCounter++;
     }
+    glfwTerminate();
     return 0;
 }

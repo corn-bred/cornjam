@@ -31,10 +31,12 @@ class Entity {
 class Player : public Entity {
     public:
     glm::vec2 Resistance;
-    Player(glm::vec2 position = glm::vec2(0.0), float directionRad = 0.0, glm::vec2 velocity = glm::vec2(0.0), glm::vec2 resistance = glm::vec2(1.0), glm::vec2 scaleLocal = glm::vec2(1.0), glm::vec2 scaleGlobal = glm::vec2(1.0)) {
+    glm::vec2 Speed;
+    Player(glm::vec2 position = glm::vec2(0.0), float directionRad = 0.0, glm::vec2 speed = glm::vec2(0.0), glm::vec2 velocity = glm::vec2(0.0), glm::vec2 resistance = glm::vec2(1.0), glm::vec2 scaleLocal = glm::vec2(1.0), glm::vec2 scaleGlobal = glm::vec2(1.0)) {
         Position = position;
         Velocity = velocity;
         Resistance = resistance;
+        Speed = speed;
         DirectionRad = directionRad;
         Direction = glm::vec2(std::cos(DirectionRad), std::sin(DirectionRad));
         ScaleLocal = scaleLocal;
@@ -43,8 +45,9 @@ class Player : public Entity {
 
     void VeloUpdate(double deltaTime) {
         Position += Velocity * (float)deltaTime;
-        Velocity.x *= glm::pow(Resistance.x, deltaTime * 60);
-        Velocity.y *= glm::pow(Resistance.y, deltaTime * 60);
+        Velocity.x = Velocity.x * glm::pow(Resistance.x, deltaTime * 60);
+        Velocity.y = Velocity.y * glm::pow(Resistance.y, deltaTime * 60);
+        //Velocity.y = Velocity.y - (18000.0 * deltaTime);
     }
 
     glm::mat4 GetTransformMatrix() {

@@ -9,6 +9,7 @@
 #include <cornbreadlib/primitives.h>
 #include <cornbreadlib/vertexbuffer.h>
 #include <cornbreadlib/shaders.h>
+#include <cornbreadlib/texturebuffer.h>
 #include "entity.h"
 
 using namespace std;
@@ -19,7 +20,7 @@ double DeltaTime, LastFrame;
 unsigned int FPSCounter, ShownFPS;
 int FrameIndex = 0;
 
-Player mainPlayer(glm::vec2(WIDTH / 2.0f, HEIGHT / 2.0f), 0.0f, glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(200.0f, 200.0f));
+Player mainPlayer(glm::vec2(WIDTH / 2.0f, HEIGHT / 2.0f), 0.0f, glm::vec2(500.0f, 500.0f), glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(50.0f));
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     WIDTH = width;
@@ -28,14 +29,14 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
 }
 
 void processInput(GLFWwindow *window) {
-    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        mainPlayer.Velocity.y = 200.0;
-    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        mainPlayer.Velocity.y = -200.0;
-    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        mainPlayer.Velocity.x = -200.0;
-    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        mainPlayer.Velocity.x = 200.0;
+    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        mainPlayer.Velocity.y = mainPlayer.Speed.y;
+    if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        mainPlayer.Velocity.y = -mainPlayer.Speed.y;
+    if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        mainPlayer.Velocity.x = -mainPlayer.Speed.x;
+    if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        mainPlayer.Velocity.x = mainPlayer.Speed.x;
 }
 
 float LastX = -1.0, LastY = -1.0;
@@ -87,11 +88,16 @@ int main() {
         return 1;
     }
 
-    
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     VertexBuffer mainVBO(quadData, sizeof(quadData), GL_STATIC_DRAW);
-    mainVBO.addAttribute(0, 2, 2, GL_FLOAT, sizeof(float), 0);
+    mainVBO.addAttribute(0, 4, 2, GL_FLOAT, sizeof(float), 0);
+    mainVBO.addAttribute(1, 4, 2, GL_FLOAT, sizeof(float), 2);
 
     Shader mainShader("src/shaders/main.vert", "src/shaders/main.frag");
+
+    TextureBuffer playerTexture("res/goofy ahh thing.png");
 
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -123,6 +129,8 @@ int main() {
         glm::mat4 Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -1.0f, 1.0f);
         mainShader.setMat4("projection", Projection);
         //cout << "Projection matrix:\n" << glm::to_string(Projection) << endl;
+
+        playerTexture.bindTexture(0);
 
         mainVBO.bind();
 

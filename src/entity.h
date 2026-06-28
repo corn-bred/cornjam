@@ -10,7 +10,8 @@ class Entity {
     glm::vec2 Direction;
     float DirectionRad;
     public:
-    glm::vec2 Position, Velocity;
+    glm::vec3 Position;
+    glm::vec2 Velocity;
     
     glm::vec2 ScaleLocal;
     glm::vec2 ScaleGlobal;
@@ -32,7 +33,7 @@ class Player : public Entity {
     public:
     glm::vec2 Resistance;
     glm::vec2 Speed;
-    Player(glm::vec2 position = glm::vec2(0.0), float directionRad = 0.0, glm::vec2 speed = glm::vec2(0.0), glm::vec2 velocity = glm::vec2(0.0), glm::vec2 resistance = glm::vec2(1.0), glm::vec2 scaleLocal = glm::vec2(1.0), glm::vec2 scaleGlobal = glm::vec2(1.0)) {
+    Player(glm::vec3 position = glm::vec3(0.0), float directionRad = 0.0, glm::vec2 speed = glm::vec2(0.0), glm::vec2 velocity = glm::vec2(0.0), glm::vec2 resistance = glm::vec2(1.0), glm::vec2 scaleLocal = glm::vec2(1.0), glm::vec2 scaleGlobal = glm::vec2(1.0)) {
         Position = position;
         Velocity = velocity;
         Resistance = resistance;
@@ -44,7 +45,7 @@ class Player : public Entity {
     }
 
     void VeloUpdate(double deltaTime) {
-        Position += Velocity * (float)deltaTime;
+        Position += glm::vec3(Velocity * (float)(deltaTime), 0.0);
         Velocity.x = Velocity.x * glm::pow(Resistance.x, deltaTime * 60);
         Velocity.y = Velocity.y * glm::pow(Resistance.y, deltaTime * 60);
         //Velocity.y = Velocity.y - (18000.0 * deltaTime);

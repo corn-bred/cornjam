@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/string_cast.hpp> 
 #include <cornbreadlib/primitives.h>
 #include <cornbreadlib/vertexbuffer.h>
 #include <cornbreadlib/shaders.h>
@@ -20,7 +20,7 @@ double DeltaTime, LastFrame;
 unsigned int FPSCounter, ShownFPS;
 int FrameIndex = 0;
 
-Player mainPlayer(glm::vec2(WIDTH / 2.0f, HEIGHT / 2.0f), 0.0f, glm::vec2(500.0f, 500.0f), glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(50.0f));
+Player mainPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f, 1.0), 0.0f, glm::vec2(500.0f, 500.0f), glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(50.0f));
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     WIDTH = width;
@@ -126,7 +126,7 @@ int main() {
         glm::mat4 View = glm::mat4(1.0f);
         mainShader.setMat4("view", View);
 
-        glm::mat4 Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -1.0f, 1.0f);
+        glm::mat4 Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -100.0f, 100.0f);
         mainShader.setMat4("projection", Projection);
         //cout << "Projection matrix:\n" << glm::to_string(Projection) << endl;
 

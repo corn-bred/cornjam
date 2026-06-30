@@ -3,6 +3,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/exponential.hpp>
 #include <vector>
+#include <cornbreadlib/shaders.h>
+#include <cornbreadlib/primitives.h>
+#include <cornbreadlib/vertexbuffer.h>
 
 class GridSpace {
     public:
@@ -15,14 +18,14 @@ class GridSpace {
         Origin = origin;
     }
 
-    void addSquare(int arrayX, int arrayY) {
+    void AddSquare(int arrayX, int arrayY) {
         Data.push_back(arrayX);
         Data.push_back(arrayY);
     }
 
     glm::mat4 GetTransformMatrix(unsigned int index) {
-        int arrayX = index;
-        int arrayY = index + 1;
+        int arrayX = index * 2;
+        int arrayY = index * 2 + 1;
         glm::mat4 Matrix(1.0f);
 
         Matrix = glm::translate(Matrix, Origin);
@@ -30,5 +33,24 @@ class GridSpace {
         Matrix = glm::scale(Matrix, glm::vec3(GridRes.x, GridRes.y, 1.0));
         
         return Matrix;
+    }
+
+    void RenderAll(Shader &shader, VertexBuffer &vertexbuffer, glm::mat4 View, glm::mat4 Projection) {
+        for (int i = 0; i < floor(Data.size() / 2.0) ; i++) {
+            shader.use();
+
+            glm::mat4 Model = GetTransformMatrix(i);
+            shader.setMat4("model", Model);
+            //std::cout << "Model matrix:\n" << glm::to_string(Model) << std::endl;
+
+            shader.setMat4("view", View);
+
+            shader.setMat4("projection", Projection);
+            //cout << "Projection matrix:\n" << glm::to_string(Projection) << endl;
+
+            vertexbuffer.bind();
+
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
     }
 };

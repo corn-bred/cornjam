@@ -2,24 +2,27 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/exponential.hpp>
+#include <vector>
 
 class GridSpace {
     public:
     glm::vec2 GridRes;
     glm::vec3 Origin;
-    bool GridData[15][15];
+    std::vector<int> Data;
 
     GridSpace(glm::vec2 pixelResolution, glm::vec3 origin) {
         GridRes = pixelResolution;
         Origin = origin;
-        for (int i = 0; i < 15; i++) {
-            for (int j = 0; j < 15; j++) {
-                GridData[i][j] = false;
-            }
-        }
     }
 
-    glm::mat4 GetTransformMatrix(unsigned int arrayX, unsigned int arrayY) {
+    void addSquare(int arrayX, int arrayY) {
+        Data.push_back(arrayX);
+        Data.push_back(arrayY);
+    }
+
+    glm::mat4 GetTransformMatrix(unsigned int index) {
+        int arrayX = index;
+        int arrayY = index + 1;
         glm::mat4 Matrix(1.0f);
 
         Matrix = glm::translate(Matrix, Origin);

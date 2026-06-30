@@ -11,6 +11,7 @@
 #include <cornbreadlib/shaders.h>
 #include <cornbreadlib/texturebuffer.h>
 #include "entity.h"
+#include "grid.h"
 
 using namespace std;
 
@@ -99,6 +100,12 @@ int main() {
 
     TextureBuffer playerTexture("res/goofy ahh thing.png");
 
+    GridSpace gridTest(glm::vec2(30.0), glm::vec3(0.0));
+    gridTest.AddSquare(0, 0);
+    gridTest.AddSquare(0, 1);
+    gridTest.AddSquare(1, 0);
+    gridTest.AddSquare(1, 1);
+
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -135,6 +142,9 @@ int main() {
         mainVBO.bind();
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        gridTest.RenderAll(mainShader, mainVBO, View, Projection);
+
         glfwSwapBuffers(window);
 
         FPSCounter++;

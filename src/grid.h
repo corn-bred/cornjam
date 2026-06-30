@@ -24,8 +24,8 @@ class GridSpace {
     }
 
     glm::mat4 GetTransformMatrix(unsigned int index) {
-        int arrayX = index * 2;
-        int arrayY = index * 2 + 1;
+        int arrayX = Data.at(index * 2);
+        int arrayY = Data.at(index * 2 + 1);
         glm::mat4 Matrix(1.0f);
 
         Matrix = glm::translate(Matrix, Origin);

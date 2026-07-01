@@ -100,7 +100,7 @@ int main() {
 
     TextureBuffer playerTexture("res/goofy ahh thing.png");
 
-    GridSpace gridTest(glm::vec2(30.0), glm::vec3(0.0));
+    GridSpace gridTest(glm::vec2(30.0), glm::vec3(70, 70, 10.0));
     gridTest.AddSquare(0, 0);
     gridTest.AddSquare(0, 1);
     gridTest.AddSquare(1, 0);
@@ -136,6 +136,7 @@ int main() {
         glm::mat4 Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -100.0f, 100.0f);
         mainShader.setMat4("projection", Projection);
         //cout << "Projection matrix:\n" << glm::to_string(Projection) << endl;
+        mainShader.setBool("isSolidColour", false);
 
         playerTexture.bindTexture(0);
 

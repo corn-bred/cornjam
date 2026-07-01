@@ -41,12 +41,13 @@ class GridSpace {
 
             glm::mat4 Model = GetTransformMatrix(i);
             shader.setMat4("model", Model);
-            //std::cout << "Model matrix:\n" << glm::to_string(Model) << std::endl;
 
             shader.setMat4("view", View);
 
             shader.setMat4("projection", Projection);
-            //cout << "Projection matrix:\n" << glm::to_string(Projection) << endl;
+
+            shader.setBool("isSolidColour", true);
+            shader.setVec3("Colour", glm::vec3(0.15, 1.0, 0.05));
 
             vertexbuffer.bind();
 

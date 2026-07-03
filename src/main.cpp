@@ -12,6 +12,7 @@
 #include <cornbreadlib/texturebuffer.h>
 #include "entity.h"
 #include "grid.h"
+#include "collision.h"
 
 using namespace std;
 
@@ -21,7 +22,7 @@ double DeltaTime, LastFrame;
 unsigned int FPSCounter, ShownFPS;
 int FrameIndex = 0;
 
-Player mainPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f, 1.0), 0.0f, glm::vec2(500.0f, 500.0f), glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(50.0f));
+Player mainPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f, 1.0), 0.0f, glm::vec2(500.0f, 500.0f), glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(50.0f), glm::vec2(1.0), glm::vec2(0.0), glm::vec2(50.0));
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     WIDTH = width;
@@ -100,11 +101,7 @@ int main() {
 
     TextureBuffer playerTexture("res/goofy ahh thing.png");
 
-    GridSpace gridTest(glm::vec2(30.0), glm::vec3(70, 70, 10.0));
-    gridTest.AddSquare(0, 0);
-    gridTest.AddSquare(0, 1);
-    gridTest.AddSquare(1, 0);
-    gridTest.AddSquare(1, 1);
+    Player secondPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f + 100.0, 1.0), 0.0f, glm::vec2(500.0f, 500.0f), glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(50.0f), glm::vec2(1.0), glm::vec2(0.0), glm::vec2(50.0));
 
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -123,7 +120,7 @@ int main() {
         glfwPollEvents();
         processInput(window);
 
-        mainPlayer.VeloUpdate(DeltaTime);
+        mainPlayer.VeloUpdate(DeltaTime, secondPlayer);
 
         mainShader.use();
         glm::mat4 Model = mainPlayer.GetTransformMatrix();
@@ -144,7 +141,24 @@ int main() {
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        gridTest.RenderAll(mainShader, mainVBO, View, Projection);
+        mainShader.use();
+        Model = secondPlayer.GetTransformMatrix();
+        mainShader.setMat4("model", Model);
+        //std::cout << "Model matrix:\n" << glm::to_string(Model) << std::endl;
+
+        View = glm::mat4(1.0f);
+        mainShader.setMat4("view", View);
+
+        Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -100.0f, 100.0f);
+        mainShader.setMat4("projection", Projection);
+        //cout << "Projection matrix:\n" << glm::to_string(Projection) << endl;
+        mainShader.setBool("isSolidColour", true);
+
+        mainShader.setVec3("Colour", glm::vec3(1.0, 0.4, 0.2));
+
+        mainVBO.bind();
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glfwSwapBuffers(window);
 

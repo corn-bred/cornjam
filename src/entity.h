@@ -31,21 +31,31 @@ class Entity {
 
 class Player : public Entity {
     public:
-    glm::vec2 Resistance;
-    glm::vec2 Speed;
+    glm::vec2 MinijumpPushoff;
+    int CollisionAxes[2] = {0, 0}; //{x, y}
+    glm::vec2 Resistance, AirResistance;
+    glm::vec2 Speed, TerminalSpeed;
     AABBHitbox Hitbox;
-    Player(glm::vec3 position = glm::vec3(0.0), float directionRad = 0.0, glm::vec2 speed = glm::vec2(0.0), glm::vec2 velocity = glm::vec2(0.0), glm::vec2 resistance = glm::vec2(1.0), glm::vec2 scaleLocal = glm::vec2(1.0), glm::vec2 scaleGlobal = glm::vec2(1.0), glm::vec2 hitboxPosition = glm::vec2(0.0), glm::vec2 hitboxSize = glm::vec2(1.0)) : Hitbox(hitboxPosition + glm::vec2(position.x, position.y), hitboxSize) {
+    Player(glm::vec3 position = glm::vec3(0.0), float directionRad = 0.0, glm::vec2 speed = glm::vec2(0.0), glm::vec2 velocity = glm::vec2(0.0), glm::vec2 terminalSpeed = glm::vec2(1.0), glm::vec2 resistance = glm::vec2(1.0), glm::vec2 airResistance = glm::vec2(1.0), glm::vec2 scaleLocal = glm::vec2(1.0), glm::vec2 scaleGlobal = glm::vec2(1.0), glm::vec2 hitboxPosition = glm::vec2(0.0), glm::vec2 hitboxSize = glm::vec2(1.0), glm::vec2 minijumpPushoff = glm::vec2(1.0, 1.0)) : Hitbox(hitboxPosition + glm::vec2(position.x, position.y), hitboxSize) {
         Position = position;
-        Velocity = velocity;
         Resistance = resistance;
+        AirResistance = airResistance;
         Speed = speed;
+        TerminalSpeed = terminalSpeed;
         DirectionRad = directionRad;
         Direction = glm::vec2(std::cos(DirectionRad), std::sin(DirectionRad));
         ScaleLocal = scaleLocal;
         ScaleGlobal = scaleGlobal;
+        MinijumpPushoff = minijumpPushoff;
     }
 
     void VeloUpdate(double deltaTime, GridSpace &grid, int searchRadius) { //If anything is farther than searchRadius, discard it from collision testing.
+        //First, clamp the velocities
+        Velocity.x = glm::clamp(Velocity.x, -TerminalSpeed.x, TerminalSpeed.x);
+
+        
+        CollisionAxes[0] = 0;
+
         Position.x += Velocity.x * (float)(deltaTime);
         Hitbox.Origin.x = Position.x;
 
@@ -56,17 +66,27 @@ class Player : public Entity {
             if (glm::distance(DataPosition, glm::vec2(Position.x, Position.y)) < searchRadius) { //if distance between the grid and the entity < searchRadius, then test. If not, then discard
                 AABBHitbox gridHitbox(DataPosition, grid.GridRes);
                 if(Collision(Hitbox, gridHitbox)) {
-                    Position.x += snapToSurfaceX(Hitbox, gridHitbox, Velocity.x);
+                    float Snapped = snapToSurfaceX(Hitbox, gridHitbox, Velocity.x);
+                    Position.x += Snapped;
+                    Velocity.x = 0;
+
+                    if (Snapped > 0) //Swapped, because Snapped is from colliding to snapped, not the other way around
+                        CollisionAxes[0] = -1;
+                    else if (Snapped < 0)
+                        CollisionAxes[0] = 1;
+                        
                 }
             }
             
         }
+        Hitbox.Origin.x = Position.x; //Update hitbox
+        
 
-        
-        Hitbox.Origin.x = Position.x;
-        
+        CollisionAxes[1] = 0;
+
         Position.y += Velocity.y * (float)(deltaTime);
         Hitbox.Origin.y = Position.y;
+
         for(int i = 0; i < floor(grid.Data.size() / 2); i++) { //Cycling through each piece of data, inefficient but works for now
 
             glm::vec2 DataPosition = grid.getPosition(i); //Get data
@@ -74,16 +94,33 @@ class Player : public Entity {
             if (glm::distance(DataPosition, glm::vec2(Position.x, Position.y)) < searchRadius) { //if distance between the grid and the entity < searchRadius, then test. If not, then discard
                 AABBHitbox gridHitbox(DataPosition, grid.GridRes);
                 if(Collision(Hitbox, gridHitbox)) {
-                    Position.y += snapToSurfaceY(Hitbox, gridHitbox, Velocity.y);
+                    float Snapped = snapToSurfaceY(Hitbox, gridHitbox, Velocity.y);
+                    Position.y += Snapped;
+                    Velocity.y = 0;
+
+                    if (Snapped > 0)
+                        CollisionAxes[1] = -1;
+                    else if (Snapped < 0)
+                        CollisionAxes[1] = 1;
+
                 }
             }
             
         }
+        Hitbox.Origin.y = Position.y; //Update hitbox
+        std::cout << CollisionAxes[0] << ", " << CollisionAxes[1] << std::endl;
 
-        Hitbox.Origin.y = Position.y;
-        Velocity.x = Velocity.x * glm::pow(Resistance.x, deltaTime * 60);
-        Velocity.y = Velocity.y * glm::pow(Resistance.y, deltaTime * 60);
-        //Velocity.y = Velocity.y - (18000.0 * deltaTime);
+        //Update velocities for next loop
+        if(CollisionAxes[1] != 0) {
+            Velocity.x = Velocity.x * glm::pow(Resistance.x, deltaTime * 60);
+        } else {
+            Velocity.x = Velocity.x * glm::pow(0.99, deltaTime * 60);
+        }
+        
+        //Velocity.y = Velocity.y * glm::pow(Resistance.y, deltaTime * 60);
+        Velocity.y = Velocity.y - (6000.0 * deltaTime);
+        std::cout << Position.x << ", " << Position.y << " : ";
+        std::cout << Hitbox.Origin.x << ", " << Hitbox.Origin.y << std::endl;
     }
 
     glm::mat4 GetTransformMatrix() {

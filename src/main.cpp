@@ -22,7 +22,7 @@ double DeltaTime, LastFrame;
 unsigned int FPSCounter, ShownFPS;
 int FrameIndex = 0;
 
-Player mainPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f, 1.0), 0.0f, glm::vec2(500.0f, 500.0f), glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(50.0f), glm::vec2(1.0), glm::vec2(0.0), glm::vec2(50.0));
+Player mainPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f, 1.0), 0.0f, glm::vec2(10.0f, 1700.0f), glm::vec2(0.0), glm::vec2(1000.0f, 30000.0f), glm::vec2(0.8f), glm::vec2(0.92f), glm::vec2(50.0f), glm::vec2(1.0), glm::vec2(0.0), glm::vec2(50.0), glm::vec2(1.0f, 0.5f));
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     WIDTH = width;
@@ -31,14 +31,34 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
 }
 
 void processInput(GLFWwindow *window) {
-    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        if (mainPlayer.CollisionAxes[1] != 0)
+        mainPlayer.Velocity.x += -mainPlayer.Speed.x;
+        else
+        mainPlayer.Velocity.x += -mainPlayer.Speed.x * (1 - (mainPlayer.AirResistance.x / 2));
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        if (mainPlayer.CollisionAxes[1] != 0)
+        mainPlayer.Velocity.x += mainPlayer.Speed.x;
+        else
+        mainPlayer.Velocity.x += mainPlayer.Speed.x * (1 - (mainPlayer.AirResistance.x / 2));
+    }
+
+    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        if (mainPlayer.CollisionAxes[1] != 0)
         mainPlayer.Velocity.y = mainPlayer.Speed.y;
-    if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        else if (mainPlayer.CollisionAxes[0] != 0) { //To stop climb bugging
+            mainPlayer.Velocity.y = mainPlayer.Speed.y * mainPlayer.MinijumpPushoff.y;
+            mainPlayer.Velocity.x = mainPlayer.TerminalSpeed.x * -mainPlayer.CollisionAxes[0] * mainPlayer.MinijumpPushoff[0];
+        }
+    }
+
+    /*if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         mainPlayer.Velocity.y = -mainPlayer.Speed.y;
-    if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        mainPlayer.Velocity.x = -mainPlayer.Speed.x;
-    if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        mainPlayer.Velocity.x = mainPlayer.Speed.x;
+    }*/
+
+    
 }
 
 float LastX = -1.0, LastY = -1.0;
@@ -51,7 +71,6 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 }
 
 int main() {
-    cout << "hi";
     if (!glfwInit()) {
         cerr << "GLFW initialization failure\n";
         return 1;
@@ -101,15 +120,12 @@ int main() {
 
     TextureBuffer playerTexture("res/goofy ahh thing.png");
 
-    Player secondPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f + 100.0, 1.0), 0.0f, glm::vec2(500.0f, 500.0f), glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(50.0f), glm::vec2(1.0), glm::vec2(0.0), glm::vec2(50.0));
-
-    GridSpace gridTest(glm::vec2(50.0), glm::vec3(0.0));
+    GridSpace gridTest(glm::vec2(WIDTH/10, HEIGHT/10), glm::vec3(0.0));
 
     gridTest.Data = {
-    0, 0,
-    1, 0,
-    0, 1,
-    1, 1
+    0,0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9,0,
+    -1,0,-1,1,-1,2,-1,3,-1,4,-1,5,-1,6,-1,7,-1,8,-1,9,-1,10,
+    10,0,10,1,10,2,10,3,10,4,10,5,10,6,10,7,10,8,10,9,10,10
     };
 
     while(!glfwWindowShouldClose(window)) { 
@@ -129,7 +145,7 @@ int main() {
         glfwPollEvents();
         processInput(window);
 
-        mainPlayer.VeloUpdate(DeltaTime, gridTest, 100);
+        mainPlayer.VeloUpdate(DeltaTime, gridTest, 300);
 
         mainShader.use();
         glm::mat4 Model = mainPlayer.GetTransformMatrix();
@@ -145,25 +161,6 @@ int main() {
         mainShader.setBool("isSolidColour", false);
 
         playerTexture.bindTexture(0);
-
-        mainVBO.bind();
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        mainShader.use();
-        Model = secondPlayer.GetTransformMatrix();
-        mainShader.setMat4("model", Model);
-        //std::cout << "Model matrix:\n" << glm::to_string(Model) << std::endl;
-
-        View = glm::mat4(1.0f);
-        mainShader.setMat4("view", View);
-
-        Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -100.0f, 100.0f);
-        mainShader.setMat4("projection", Projection);
-        //cout << "Projection matrix:\n" << glm::to_string(Projection) << endl;
-        mainShader.setBool("isSolidColour", true);
-
-        mainShader.setVec3("Colour", glm::vec3(1.0, 0.4, 0.2));
 
         mainVBO.bind();
 

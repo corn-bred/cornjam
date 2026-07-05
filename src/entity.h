@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/exponential.hpp>
 #include "collision.h"
+#include "grid.h"
 
 class Entity {
     protected:
@@ -44,18 +45,41 @@ class Player : public Entity {
         ScaleGlobal = scaleGlobal;
     }
 
-    void VeloUpdate(double deltaTime, Player secondPlayer) {
+    void VeloUpdate(double deltaTime, GridSpace &grid, int searchRadius) { //If anything is farther than searchRadius, discard it from collision testing.
         Position.x += Velocity.x * (float)(deltaTime);
         Hitbox.Origin.x = Position.x;
-        if(Collision(Hitbox, secondPlayer.Hitbox)) {
-            Position.x += snapToSurfaceX(Hitbox, secondPlayer.Hitbox, Velocity.x);
+
+        for(int i = 0; i < floor(grid.Data.size() / 2); i++) { //Cycling through each piece of data, inefficient but works for now
+
+            glm::vec2 DataPosition = grid.getPosition(i); //Get data
+
+            if (glm::distance(DataPosition, glm::vec2(Position.x, Position.y)) < searchRadius) { //if distance between the grid and the entity < searchRadius, then test. If not, then discard
+                AABBHitbox gridHitbox(DataPosition, grid.GridRes);
+                if(Collision(Hitbox, gridHitbox)) {
+                    Position.x += snapToSurfaceX(Hitbox, gridHitbox, Velocity.x);
+                }
+            }
+            
         }
+
+        
         Hitbox.Origin.x = Position.x;
+        
         Position.y += Velocity.y * (float)(deltaTime);
         Hitbox.Origin.y = Position.y;
-        if(Collision(Hitbox, secondPlayer.Hitbox)) {
-            Position.y += snapToSurfaceY(Hitbox, secondPlayer.Hitbox, Velocity.y);
+        for(int i = 0; i < floor(grid.Data.size() / 2); i++) { //Cycling through each piece of data, inefficient but works for now
+
+            glm::vec2 DataPosition = grid.getPosition(i); //Get data
+
+            if (glm::distance(DataPosition, glm::vec2(Position.x, Position.y)) < searchRadius) { //if distance between the grid and the entity < searchRadius, then test. If not, then discard
+                AABBHitbox gridHitbox(DataPosition, grid.GridRes);
+                if(Collision(Hitbox, gridHitbox)) {
+                    Position.y += snapToSurfaceY(Hitbox, gridHitbox, Velocity.y);
+                }
+            }
+            
         }
+
         Hitbox.Origin.y = Position.y;
         Velocity.x = Velocity.x * glm::pow(Resistance.x, deltaTime * 60);
         Velocity.y = Velocity.y * glm::pow(Resistance.y, deltaTime * 60);

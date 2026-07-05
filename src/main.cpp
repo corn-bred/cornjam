@@ -103,6 +103,15 @@ int main() {
 
     Player secondPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f + 100.0, 1.0), 0.0f, glm::vec2(500.0f, 500.0f), glm::vec2(0.0f), glm::vec2(0.8f), glm::vec2(50.0f), glm::vec2(1.0), glm::vec2(0.0), glm::vec2(50.0));
 
+    GridSpace gridTest(glm::vec2(50.0), glm::vec3(0.0));
+
+    gridTest.Data = {
+    0, 0,
+    1, 0,
+    0, 1,
+    1, 1
+    };
+
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -120,7 +129,7 @@ int main() {
         glfwPollEvents();
         processInput(window);
 
-        mainPlayer.VeloUpdate(DeltaTime, secondPlayer);
+        mainPlayer.VeloUpdate(DeltaTime, gridTest, 100);
 
         mainShader.use();
         glm::mat4 Model = mainPlayer.GetTransformMatrix();
@@ -159,6 +168,8 @@ int main() {
         mainVBO.bind();
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        gridTest.RenderAll(mainShader, mainVBO, View, Projection);
 
         glfwSwapBuffers(window);
 

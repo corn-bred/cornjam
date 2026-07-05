@@ -35,6 +35,12 @@ class GridSpace {
         return Matrix;
     }
 
+    inline glm::vec2 getData(unsigned int index) { return glm::vec2 ( Data.at(index * 2), Data.at(index * 2 + 1) ); }
+
+    inline glm::vec2 getPosition(unsigned int index) {
+        return glm::vec2(glm::vec2(Origin.x, Origin.y) + glm::vec2(GridRes.x * getData(index).x, GridRes.y * getData(index).y));
+    }
+
     void RenderAll(Shader &shader, VertexBuffer &vertexbuffer, glm::mat4 View, glm::mat4 Projection) {
         for (int i = 0; i < floor(Data.size() / 2.0) ; i++) {
             shader.use();

@@ -31,12 +31,13 @@ class Entity {
 
 class Player : public Entity {
     public:
+    float WallStickStrength; //Strength of being able to stay on a wall
     glm::vec2 MinijumpPushoff;
     int CollisionAxes[2] = {0, 0}; //{x, y}
     glm::vec2 Resistance, AirResistance;
     glm::vec2 Speed, TerminalSpeed;
     AABBHitbox Hitbox;
-    Player(glm::vec3 position = glm::vec3(0.0), float directionRad = 0.0, glm::vec2 speed = glm::vec2(0.0), glm::vec2 velocity = glm::vec2(0.0), glm::vec2 terminalSpeed = glm::vec2(1.0), glm::vec2 resistance = glm::vec2(1.0), glm::vec2 airResistance = glm::vec2(1.0), glm::vec2 scaleLocal = glm::vec2(1.0), glm::vec2 scaleGlobal = glm::vec2(1.0), glm::vec2 hitboxPosition = glm::vec2(0.0), glm::vec2 hitboxSize = glm::vec2(1.0), glm::vec2 minijumpPushoff = glm::vec2(1.0, 1.0)) : Hitbox(hitboxPosition + glm::vec2(position.x, position.y), hitboxSize) {
+    Player(glm::vec3 position = glm::vec3(0.0), float directionRad = 0.0, glm::vec2 speed = glm::vec2(0.0), glm::vec2 velocity = glm::vec2(0.0), glm::vec2 terminalSpeed = glm::vec2(1.0), glm::vec2 resistance = glm::vec2(1.0), glm::vec2 airResistance = glm::vec2(1.0), glm::vec2 scaleLocal = glm::vec2(1.0), glm::vec2 scaleGlobal = glm::vec2(1.0), glm::vec2 hitboxPosition = glm::vec2(0.0), glm::vec2 hitboxSize = glm::vec2(1.0), glm::vec2 minijumpPushoff = glm::vec2(1.0, 1.0), float wallStickStrength = 1.0f) : Hitbox(hitboxPosition + glm::vec2(position.x, position.y), hitboxSize) {
         Position = position;
         Resistance = resistance;
         AirResistance = airResistance;
@@ -47,9 +48,10 @@ class Player : public Entity {
         ScaleLocal = scaleLocal;
         ScaleGlobal = scaleGlobal;
         MinijumpPushoff = minijumpPushoff;
+        WallStickStrength = wallStickStrength;
     }
 
-    void VeloUpdate(double deltaTime, GridSpace &grid, int searchRadius) { //If anything is farther than searchRadius, discard it from collision testing.
+    void VeloUpdate(double deltaTime, GridSpace &grid, int searchRadius, float gravity) { //If anything is farther than searchRadius, discard it from collision testing.
         //First, clamp the velocities
         Velocity.x = glm::clamp(Velocity.x, -TerminalSpeed.x, TerminalSpeed.x);
 
@@ -108,7 +110,7 @@ class Player : public Entity {
             
         }
         Hitbox.Origin.y = Position.y; //Update hitbox
-        std::cout << CollisionAxes[0] << ", " << CollisionAxes[1] << std::endl;
+        //std::cout << CollisionAxes[0] << ", " << CollisionAxes[1] << std::endl;
 
         //Update velocities for next loop
         if(CollisionAxes[1] != 0) {
@@ -118,14 +120,14 @@ class Player : public Entity {
         }
         
         //Velocity.y = Velocity.y * glm::pow(Resistance.y, deltaTime * 60);
-        if (CollisionAxes[0] != 0) {
-            Velocity.y = glm::clamp(Velocity.y - (6000.0 * deltaTime), -500.0, 500.0);
+        if (CollisionAxes[0] != 0 && CollisionAxes[1] == 0) {
+            Velocity.y = glm::clamp( float(Velocity.y - (gravity * deltaTime)), -gravity / (Speed.x * WallStickStrength), gravity / (Speed.x * WallStickStrength));
         } else {
-            Velocity.y = Velocity.y - (6000.0 * deltaTime);
+            Velocity.y = Velocity.y - (gravity * deltaTime);
         }
         
-        std::cout << Position.x << ", " << Position.y << " : ";
-        std::cout << Hitbox.Origin.x << ", " << Hitbox.Origin.y << std::endl;
+        //std::cout << Position.x << ", " << Position.y << " : ";
+        //std::cout << Hitbox.Origin.x << ", " << Hitbox.Origin.y << std::endl;
     }
 
     glm::mat4 GetTransformMatrix() {

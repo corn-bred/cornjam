@@ -22,7 +22,7 @@ double DeltaTime, LastFrame;
 unsigned int FPSCounter, ShownFPS;
 int FrameIndex = 0;
 
-Player mainPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f, 1.0), 0.0f, glm::vec2(10.0f, 1700.0f), glm::vec2(0.0), glm::vec2(1000.0f, 30000.0f), glm::vec2(0.8f), glm::vec2(0.92f), glm::vec2(50.0f), glm::vec2(1.0), glm::vec2(0.0), glm::vec2(50.0), glm::vec2(1.0f, 0.5f));
+Player mainPlayer(glm::vec3(WIDTH / 2.0f, HEIGHT / 2.0f, 1.0), 0.0f, glm::vec2(150.0f, 1700.0f), glm::vec2(0.0), glm::vec2(1000.0f, 30000.0f), glm::vec2(0.8f), glm::vec2(0.92f), glm::vec2(50.0f), glm::vec2(1.0), glm::vec2(0.0), glm::vec2(50.0), glm::vec2(1.0f, 0.5f), 0.1);
 
 void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     WIDTH = width;
@@ -33,30 +33,31 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
 void processInput(GLFWwindow *window) {
     if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
         if (mainPlayer.CollisionAxes[1] != 0)
-        mainPlayer.Velocity.x += -mainPlayer.Speed.x;
-        else
-        mainPlayer.Velocity.x += -mainPlayer.Speed.x * (1 - (mainPlayer.AirResistance.x / 2));
+        mainPlayer.Velocity.x += -mainPlayer.Speed.x * (DeltaTime * 60);
+        else {
+        mainPlayer.Velocity.x += -mainPlayer.Speed.x * (1 - (mainPlayer.AirResistance.x / 2)) * (DeltaTime * 60);
+        }
     }
 
     if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
         if (mainPlayer.CollisionAxes[1] != 0)
-        mainPlayer.Velocity.x += mainPlayer.Speed.x;
+        mainPlayer.Velocity.x += mainPlayer.Speed.x * (DeltaTime * 60);
         else
-        mainPlayer.Velocity.x += mainPlayer.Speed.x * (1 - (mainPlayer.AirResistance.x / 2));
+        mainPlayer.Velocity.x += mainPlayer.Speed.x * (1 - (mainPlayer.AirResistance.x / 2)) * (DeltaTime * 60);
     }
 
     if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        if (mainPlayer.CollisionAxes[1] != 0)
+        if (mainPlayer.CollisionAxes[1] == -1)
         mainPlayer.Velocity.y = mainPlayer.Speed.y;
-        else if (mainPlayer.CollisionAxes[0] != 0) { //To stop climb bugging
+        else if (mainPlayer.CollisionAxes[0] != 0 && mainPlayer.CollisionAxes[1] == 0) { //To stop climb bugging
             mainPlayer.Velocity.y = mainPlayer.Speed.y * mainPlayer.MinijumpPushoff.y;
             mainPlayer.Velocity.x = mainPlayer.TerminalSpeed.x * -mainPlayer.CollisionAxes[0] * mainPlayer.MinijumpPushoff[0];
         }
     }
 
-    /*if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         mainPlayer.Velocity.y = -mainPlayer.Speed.y;
-    }*/
+    }
 
     
 }
@@ -90,7 +91,7 @@ int main() {
 
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     GLFWmonitor *monitor = glfwGetPrimaryMonitor();
     GLFWvidmode *mode = const_cast<GLFWvidmode*>(glfwGetVideoMode(monitor));
@@ -145,7 +146,7 @@ int main() {
         glfwPollEvents();
         processInput(window);
 
-        mainPlayer.VeloUpdate(DeltaTime, gridTest, 300);
+        mainPlayer.VeloUpdate(DeltaTime, gridTest, 300, 6000.0f);
 
         mainShader.use();
         glm::mat4 Model = mainPlayer.GetTransformMatrix();

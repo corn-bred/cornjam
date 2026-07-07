@@ -118,7 +118,12 @@ class Player : public Entity {
         }
         
         //Velocity.y = Velocity.y * glm::pow(Resistance.y, deltaTime * 60);
-        Velocity.y = Velocity.y - (6000.0 * deltaTime);
+        if (CollisionAxes[0] != 0) {
+            Velocity.y = glm::clamp(Velocity.y - (6000.0 * deltaTime), -500.0, 500.0);
+        } else {
+            Velocity.y = Velocity.y - (6000.0 * deltaTime);
+        }
+        
         std::cout << Position.x << ", " << Position.y << " : ";
         std::cout << Hitbox.Origin.x << ", " << Hitbox.Origin.y << std::endl;
     }

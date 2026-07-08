@@ -21,9 +21,10 @@ void main() {
         vec2 TexLocalCoords = iTexCoords * TexSize;
 
         int Column = Frame % Columns;
-        int Row = Frame / Columns;
+        int Row = int(floor(float(Frame) / float(Columns)));
 
         vec2 TexCoords = vec2(TexLocalCoords.x + (TexSize.x * Column), TexLocalCoords.y + (TexSize.y * Row));
+        TexCoords.y = 1.0 - TexCoords.y; //Flip
         FragColour = texture(Texture, TexCoords);
     } else {
         FragColour = texture(Texture, iTexCoords);

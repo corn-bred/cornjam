@@ -13,6 +13,7 @@
 #include "entity.h"
 #include "grid.h"
 #include "collision.h"
+#include "spritesheet.h"
 
 using namespace std;
 
@@ -91,7 +92,7 @@ int main() {
 
     glfwMakeContextCurrent(window);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     GLFWmonitor *monitor = glfwGetPrimaryMonitor();
     GLFWvidmode *mode = const_cast<GLFWvidmode*>(glfwGetVideoMode(monitor));
@@ -129,6 +130,8 @@ int main() {
     10,0,10,1,10,2,10,3,10,4,10,5,10,6,10,7,10,8,10,9,10,10
     };
 
+    Animation CubeRotating(0, 49, 0.04167, true, "res/rotatingcube.png", 10, 5, GL_CLAMP_TO_BORDER,GL_CLAMP_TO_BORDER); // 1/24 is irrational
+
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -160,6 +163,7 @@ int main() {
         mainShader.setMat4("projection", Projection);
         //cout << "Projection matrix:\n" << glm::to_string(Projection) << endl;
         mainShader.setBool("isSolidColour", false);
+        mainShader.setBool("isAnimation", false);
 
         playerTexture.bindTexture(0);
 
@@ -168,6 +172,14 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         gridTest.RenderAll(mainShader, mainVBO, View, Projection);
+
+
+
+        CubeRotating.Update(currentframe, DeltaTime);
+
+        glm::mat4 animModel = glm::mat4(1.0);
+        animModel = glm::scale(animModel, glm::vec3(100, 100, 0));
+        CubeRotating.RenderSprite(mainShader, mainVBO, animModel, View, Projection);
 
         glfwSwapBuffers(window);
 

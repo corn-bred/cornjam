@@ -27,12 +27,12 @@ class Anim_FrameHandler {
     float FrameDuration;
     bool isLooping;
 
-    int GetCurrentFrame(float currentTime, float deltaTime) {
+    void UpdateFrame(float currentTime, float deltaTime) {
 
         if (isLooping) {
 
             int TotalFrames = EndFrame - StartFrame + 1;
-            return (int(floor(currentTime / FrameDuration)) % TotalFrames) + StartFrame;
+            CurrentFrame = (int(floor(currentTime / FrameDuration)) % TotalFrames) + StartFrame;
 
         } else {
             FrameTime += deltaTime;
@@ -47,15 +47,15 @@ class Anim_FrameHandler {
                 else CurrentFrame = EndFrame;
             }
 
-            return CurrentFrame;
         }
 
     }
 
-    void PlayAnimation() {
+    void ResetAnimation() {
         CurrentFrame = StartFrame;
         FrameTime = 0.0f;
     }
+
     inline int GetFrame() {
         return CurrentFrame;
     }
@@ -64,9 +64,16 @@ class Anim_FrameHandler {
 class Anim_SpriteRenderer {
     public:
     TextureBuffer Sprite;
-    Anim_SpriteRenderer(const char *texturepath, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR) : Sprite(texturepath, wrappingS, wrappingT, min, mag) {}
-    Anim_SpriteRenderer(TextureBuffer &sprite) : Sprite(sprite) {}
-    bool RenderSprite(Shader &shader, VertexBuffer &VBO, glm::mat4 Model, glm::mat4 View, glm::mat4 Projection, int Columns, int Rows, int Frame) {
+    int Rows, Columns;
+    Anim_SpriteRenderer(const char *texturepath, int rows, int columns, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR) : Sprite(texturepath, wrappingS, wrappingT, min, mag) {
+        Rows = rows;
+        Columns = columns;
+    }
+    Anim_SpriteRenderer(TextureBuffer &sprite, int rows, int columns) : Sprite(sprite) {
+        Rows = rows;
+        Columns = columns;
+    }
+    void RenderSprite(Shader &shader, VertexBuffer &VBO, glm::mat4 &Model, glm::mat4 &View, glm::mat4 &Projection, int Frame) {
         shader.use();
 
         shader.setMat4("model", Model);
@@ -96,19 +103,18 @@ class Animation {
     public:
     Anim_FrameHandler FrameHandler;
     Anim_SpriteRenderer SpriteRenderer;
-    int Columns, Rows;
     
-    Animation(int startframe, int endframe, float frameduration, bool islooping, const char *texturepath, int Columns, int Rows, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR) : FrameHandler(startframe, endframe, frameduration, islooping), SpriteRenderer(texturepath, wrappingS, wrappingT, min, mag) {}
+    Animation(int startframe, int endframe, float frameduration, bool islooping, const char *texturepath, int columns, int rows, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR) : FrameHandler(startframe, endframe, frameduration, islooping), SpriteRenderer(texturepath, rows, columns, wrappingS, wrappingT, min, mag) {}
 
-    bool RenderSprite(Shader &shader, VertexBuffer &VBO, glm::mat4 Model, glm::mat4 View, glm::mat4 Projection) {
-        SpriteRenderer.RenderSprite(shader, VBO, Model, View, Projection, Columns, Rows, FrameHandler.GetFrame());
+    void RenderSprite(Shader &shader, VertexBuffer &VBO, glm::mat4 &Model, glm::mat4 &View, glm::mat4 &Projection) {
+        SpriteRenderer.RenderSprite(shader, VBO, Model, View, Projection, FrameHandler.GetFrame());
     }
 
     void Update(float currentTime, float deltaTime) {
-        FrameHandler.GetCurrentFrame(currentTime, deltaTime);
+        FrameHandler.UpdateFrame(currentTime, deltaTime);
     }
     
-    void PlayAnimation() {
-        FrameHandler.PlayAnimation();
+    void ResetAnimation() {
+        FrameHandler.ResetAnimation();
     }
 };

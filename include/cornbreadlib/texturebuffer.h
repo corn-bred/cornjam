@@ -8,7 +8,7 @@
 class TextureBuffer {
     GLuint texture;
     public:
-    TextureBuffer(const char *texturepath, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR) {
+    TextureBuffer(const char *texturepath, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR, bool isFlippedVert = true) {
         glGenTextures(1, &texture);
         {
             glBindTexture(GL_TEXTURE_2D, texture);
@@ -17,7 +17,7 @@ class TextureBuffer {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
             int width, height, nrchannels;
-            stbi_set_flip_vertically_on_load(true);
+            stbi_set_flip_vertically_on_load(isFlippedVert);
             unsigned char *data = stbi_load(texturepath, &width, &height, &nrchannels, 0);
             if (data) {
                 std::cerr << "SUCCESS: " << width << "x" << height << ", channels=" << nrchannels << std::endl;

@@ -65,7 +65,7 @@ class Anim_SpriteRenderer {
     public:
     TextureBuffer Sprite;
     int Rows, Columns;
-    Anim_SpriteRenderer(const char *texturepath, int rows, int columns, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR) : Sprite(texturepath, wrappingS, wrappingT, min, mag) {
+    Anim_SpriteRenderer(const char *texturepath, int rows, int columns, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR, bool isFlippedVert = true) : Sprite(texturepath, wrappingS, wrappingT, min, mag, isFlippedVert) {
         Rows = rows;
         Columns = columns;
     }
@@ -104,7 +104,7 @@ class Animation {
     Anim_FrameHandler FrameHandler;
     Anim_SpriteRenderer SpriteRenderer;
     
-    Animation(int startframe, int endframe, float frameduration, bool islooping, const char *texturepath, int columns, int rows, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR) : FrameHandler(startframe, endframe, frameduration, islooping), SpriteRenderer(texturepath, rows, columns, wrappingS, wrappingT, min, mag) {}
+    Animation(int startframe, int endframe, float frameduration, bool islooping, const char *texturepath, int columns, int rows, GLenum wrappingS = GL_MIRRORED_REPEAT, GLenum wrappingT = GL_MIRRORED_REPEAT, GLenum min = GL_NEAREST_MIPMAP_LINEAR, GLenum mag = GL_LINEAR, bool isFlippedVert = true) : FrameHandler(startframe, endframe, frameduration, islooping), SpriteRenderer(texturepath, rows, columns, wrappingS, wrappingT, min, mag, isFlippedVert) {}
 
     void RenderSprite(Shader &shader, VertexBuffer &VBO, glm::mat4 &Model, glm::mat4 &View, glm::mat4 &Projection) {
         SpriteRenderer.RenderSprite(shader, VBO, Model, View, Projection, FrameHandler.GetFrame());

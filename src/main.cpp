@@ -130,7 +130,7 @@ int main() {
     10,0,10,1,10,2,10,3,10,4,10,5,10,6,10,7,10,8,10,9,10,10
     };
 
-    Animation CubeRotating(0, 49, 0.04167, true, "res/rotatingcube.png", 10, 5, GL_CLAMP_TO_BORDER,GL_CLAMP_TO_BORDER); // 1/24 is irrational
+    Animation CubeRotating(0, 49, 0.04167, true, "res/rotatingcube.png", 10, 5, GL_CLAMP_TO_BORDER,GL_CLAMP_TO_BORDER, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, false); // 1/24 is irrational
 
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

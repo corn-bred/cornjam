@@ -65,12 +65,18 @@ class Camera2D {
 
     //View Matrix Creation
 
-    glm::mat4 GetViewMatrix() {
+    glm::mat4 GetViewMatrix(int ScreenWidth, int ScreenHeight) {
         glm::mat4 Matrix(1.0f);
 
-        Matrix = glm::translate(Matrix, glm::vec3(-Position.x, -Position.y, 0.0));
+        Matrix = glm::translate(Matrix, glm::vec3(ScreenWidth / 2, ScreenHeight / 2, 0.0));
         Matrix = glm::rotate(Matrix, -DirectionRad, glm::vec3(0.0, 0.0, 1.0));
         Matrix = glm::scale(Matrix, glm::vec3(1.0 / Scale.x, 1.0 / Scale.y, 1.0));
+        Matrix = glm::translate(Matrix, glm::vec3(-ScreenWidth / 2, -ScreenHeight / 2, 0.0));
+
+        Matrix = glm::translate(Matrix, glm::vec3(-Position.x, -Position.y, 0.0));
+
+        
+        
         
         return Matrix;
     }

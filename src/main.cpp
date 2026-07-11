@@ -135,6 +135,7 @@ int main() {
     
     Camera2D cameraTest(glm::vec3(0.0, 0.0, 0.0), glm::vec2(1.0), 0.0);
 
+    glm::vec2 OldDifference = glm::vec2(0.0);
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -154,7 +155,13 @@ int main() {
 
         //Camera updates
         float Smoothness = -60.0 * log(1.0 - 0.1);
-        cameraTest.Position = cameraTest.CameraToEntity(mainPlayer, WIDTH, HEIGHT, 1.0 - glm::exp(-Smoothness * DeltaTime));
+        glm::vec3 NewPos = cameraTest.CameraToEntity(mainPlayer, WIDTH, HEIGHT, 1.0 - glm::exp(-Smoothness * DeltaTime));
+        glm::vec2 Difference = glm::vec2(NewPos.x - cameraTest.Position.x, NewPos.y - cameraTest.Position.y);
+        //cameraTest.SetDirection(cameraTest.GetDirectionRad() + 0.5 * DeltaTime);
+        cameraTest.Scale = glm::vec2(1.0 + abs( mainPlayer.Velocity.x * 0.0001) );
+        cameraTest.Position = NewPos;
+
+        OldDifference = Difference;
 
         //Updates
 
@@ -165,7 +172,7 @@ int main() {
         mainShader.setMat4("model", Model);
         //std::cout << "Model matrix:\n" << glm::to_string(Model) << std::endl;
 
-        glm::mat4 View = cameraTest.GetViewMatrix();
+        glm::mat4 View = cameraTest.GetViewMatrix(WIDTH, HEIGHT);
         mainShader.setMat4("view", View);
 
         glm::mat4 Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -100.0f, 100.0f);

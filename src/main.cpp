@@ -14,6 +14,7 @@
 #include "grid.h"
 #include "collision.h"
 #include "spritesheet.h"
+#include "camera2D.h"
 
 using namespace std;
 
@@ -131,6 +132,8 @@ int main() {
     };
 
     Animation CubeRotating(0, 49, 0.04167, true, "res/rotatingcube.png", 10, 5, GL_CLAMP_TO_BORDER,GL_CLAMP_TO_BORDER, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, false); // 1/24 is irrational
+    
+    Camera2D cameraTest(glm::vec3(0.0, 0.0, 0.0), glm::vec2(1.0), 0.0);
 
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -149,6 +152,12 @@ int main() {
         glfwPollEvents();
         processInput(window);
 
+        //Camera updates
+        float Smoothness = -60.0 * log(1.0 - 0.1);
+        cameraTest.Position = cameraTest.CameraToEntity(mainPlayer, WIDTH, HEIGHT, 1.0 - glm::exp(-Smoothness * DeltaTime));
+
+        //Updates
+
         mainPlayer.VeloUpdate(DeltaTime, gridTest, 300, 6000.0f);
 
         mainShader.use();
@@ -156,7 +165,7 @@ int main() {
         mainShader.setMat4("model", Model);
         //std::cout << "Model matrix:\n" << glm::to_string(Model) << std::endl;
 
-        glm::mat4 View = glm::mat4(1.0f);
+        glm::mat4 View = cameraTest.GetViewMatrix();
         mainShader.setMat4("view", View);
 
         glm::mat4 Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -100.0f, 100.0f);
@@ -172,8 +181,6 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         gridTest.RenderAll(mainShader, mainVBO, View, Projection);
-
-
 
         CubeRotating.Update(currentframe, DeltaTime);
 

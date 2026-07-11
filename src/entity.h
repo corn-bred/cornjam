@@ -25,7 +25,7 @@ class Entity {
 
     void SetDirection(glm::vec2 direction) {
         Direction = direction;
-        DirectionRad = glm::atan(direction.x, direction.y);
+        DirectionRad = glm::atan(direction.y, direction.x);
     }
 };
 
@@ -37,6 +37,7 @@ class Player : public Entity {
     glm::vec2 Resistance, AirResistance;
     glm::vec2 Speed, TerminalSpeed;
     AABBHitbox Hitbox;
+
     Player(glm::vec3 position = glm::vec3(0.0), float directionRad = 0.0, glm::vec2 speed = glm::vec2(0.0), glm::vec2 velocity = glm::vec2(0.0), glm::vec2 terminalSpeed = glm::vec2(1.0), glm::vec2 resistance = glm::vec2(1.0), glm::vec2 airResistance = glm::vec2(1.0), glm::vec2 scaleLocal = glm::vec2(1.0), glm::vec2 scaleGlobal = glm::vec2(1.0), glm::vec2 hitboxPosition = glm::vec2(0.0), glm::vec2 hitboxSize = glm::vec2(1.0), glm::vec2 minijumpPushoff = glm::vec2(1.0, 1.0), float wallStickStrength = 1.0f) : Hitbox(hitboxPosition + glm::vec2(position.x, position.y), hitboxSize) {
         Position = position;
         Resistance = resistance;
@@ -120,6 +121,7 @@ class Player : public Entity {
         }
         
         //Velocity.y = Velocity.y * glm::pow(Resistance.y, deltaTime * 60);
+
         if (CollisionAxes[0] != 0 && CollisionAxes[1] == 0) {
             Velocity.y = glm::clamp( float(Velocity.y - (gravity * deltaTime)), -gravity / (Speed.x * WallStickStrength), gravity / (Speed.x * WallStickStrength));
         } else {

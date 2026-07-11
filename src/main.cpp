@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp> 
-#include <cornbreadlib/primitives.h>
+#include <cornbreadlib/utility.h>
 #include <cornbreadlib/vertexbuffer.h>
 #include <cornbreadlib/shaders.h>
 #include <cornbreadlib/texturebuffer.h>
@@ -154,8 +154,7 @@ int main() {
         processInput(window);
 
         //Camera updates
-        float Smoothness = -60.0 * log(1.0 - 0.1);
-        glm::vec3 NewPos = cameraTest.CameraToEntity(mainPlayer, WIDTH, HEIGHT, 1.0 - glm::exp(-Smoothness * DeltaTime));
+        glm::vec3 NewPos = cameraTest.CameraToEntity(mainPlayer, WIDTH, HEIGHT, lerpToTime(0.1, DeltaTime));
         glm::vec2 Difference = glm::vec2(NewPos.x - cameraTest.Position.x, NewPos.y - cameraTest.Position.y);
         //cameraTest.SetDirection(cameraTest.GetDirectionRad() + 0.5 * DeltaTime);
         cameraTest.Scale = glm::vec2(1.0 + abs( mainPlayer.Velocity.x * 0.0001) );

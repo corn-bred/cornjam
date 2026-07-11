@@ -4,7 +4,7 @@
 #include <glm/exponential.hpp>
 #include <vector>
 #include <cornbreadlib/shaders.h>
-#include <cornbreadlib/primitives.h>
+#include <cornbreadlib/utility.h>
 #include <cornbreadlib/vertexbuffer.h>
 
 class GridSpace {

@@ -11,11 +11,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class Shader {
+class ComputeShader {
     public:
     GLuint ID;
     
-    Shader(const char* computeFilePath) {
+    ComputeShader(const char* computeFilePath) {
         std::string computeCode;
         std::ifstream computeFile;
 

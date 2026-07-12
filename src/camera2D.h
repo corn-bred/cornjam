@@ -74,9 +74,6 @@ class Camera2D {
         Matrix = glm::translate(Matrix, glm::vec3(-ScreenWidth / 2, -ScreenHeight / 2, 0.0));
 
         Matrix = glm::translate(Matrix, glm::vec3(-Position.x, -Position.y, 0.0));
-
-        
-        
         
         return Matrix;
     }

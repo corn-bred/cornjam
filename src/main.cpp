@@ -116,8 +116,8 @@ int main() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     VertexBuffer mainVBO(quadData, sizeof(quadData), GL_STATIC_DRAW);
-    mainVBO.addAttribute(0, 4, 2, GL_FLOAT, sizeof(float), 0);
-    mainVBO.addAttribute(1, 4, 2, GL_FLOAT, sizeof(float), 2);
+    mainVBO.addAttribute(0, 2, GL_FLOAT, 4, 0);
+    mainVBO.addAttribute(1, 2, GL_FLOAT, 4, 2);
 
     Shader mainShader("src/shaders/main.vert", "src/shaders/main.frag");
 

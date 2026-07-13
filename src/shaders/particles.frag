@@ -2,6 +2,7 @@
 
 in float vAlpha;
 in vec2 vTexCoords;
+
 uniform sampler2D Texture;
 
 uniform bool isSolidColour;

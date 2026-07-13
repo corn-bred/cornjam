@@ -65,6 +65,10 @@ class ComputeShader {
         glDeleteShader(compute);
     }
 
+    void bind() {
+        glUseProgram(ID);
+    }
+
     void use(unsigned int dispatchX, unsigned int dispatchY, unsigned int dispatchZ, GLuint memoryBarrier = GL_ALL_BARRIER_BITS) {
         glUseProgram(ID);
         glDispatchCompute(dispatchX, dispatchY, dispatchZ);

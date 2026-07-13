@@ -10,6 +10,8 @@ struct Particle {
     float MaxDuration;
     float Size;       
     uint Flags;   
+    float Speed;   
+    float padding; 
 };
 
 uniform float uDeltaTime;
@@ -25,7 +27,7 @@ layout(std430, binding = 0) buffer ParticleBuffer {
 #define FLAG_HAS_GRAVITY 4u
 
 float rand(float seed) {
-    return fract(sin(float(seed * 12.9898)) * 43758.5453123);
+    return sin(float(seed * 12.9898)) * 43758.5453123;
 }
 
 void main () {
@@ -50,9 +52,9 @@ void main () {
 
             float RandomVal = index + uCurrentTime; //semirandom
 
-            particle.Velocity = vec2(cos(rand(RandomVal)), sin(rand(RandomVal)));
+            particle.Velocity = vec2(cos(rand(RandomVal)) *particle.Speed, sin(rand(RandomVal)) *particle.Speed);
 
-            particle.Duration = 0.0;
+            particle.Duration = particle.Duration - particle.MaxDuration;
         } else {
             particle.Flags = particle.Flags & ~FLAG_IS_ACTIVE;
         }

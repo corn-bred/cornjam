@@ -8,6 +8,8 @@ struct Particle {
     float MaxDuration;
     float Size;       
     uint Flags;   
+    float Speed;   
+    float padding; 
 };
 
 layout(std430, binding = 0) buffer ParticleBuffer {
@@ -19,7 +21,6 @@ uniform mat4 projection;
 
 out float vAlpha;
 out vec2 vTexCoords;
-out uint vParticleIndex;
 
 void main() {
     vec2 quadVertices[6] = vec2[6](
@@ -54,5 +55,4 @@ void main() {
 
     vAlpha = (particle.MaxDuration > 0.0) ? 1.0 - particle.Duration / particle.MaxDuration : 1.0;
     vTexCoords = quadTexCoords[vertexID];
-    vParticleIndex = particleIndex;
 }

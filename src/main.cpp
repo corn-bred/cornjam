@@ -1,20 +1,28 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include <iostream>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image/stb_image.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp> 
+
 #include <cornbreadlib/utility.h>
 #include <cornbreadlib/vertexbuffer.h>
 #include <cornbreadlib/shaders.h>
 #include <cornbreadlib/texturebuffer.h>
+
 #include "entity.h"
 #include "grid.h"
 #include "collision.h"
 #include "spritesheet.h"
 #include "camera2D.h"
+#include "particles.h"
 
 using namespace std;
 
@@ -136,6 +144,11 @@ int main() {
     Camera2D cameraTest(glm::vec3(0.0, 0.0, 0.0), glm::vec2(1.0), 0.0);
 
     glm::vec2 OldDifference = glm::vec2(0.0);
+
+    Particles particleTest(50, glm::vec2(WIDTH / 2, HEIGHT / 2), 2.0, 10.0, 100.0, true, true);
+
+    particleTest.RenderSolidColourState(glm::vec3(1.0, 0.8, 0.6));
+
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -193,6 +206,9 @@ int main() {
         glm::mat4 animModel = glm::mat4(1.0);
         animModel = glm::scale(animModel, glm::vec3(100, 100, 0));
         CubeRotating.RenderSprite(mainShader, mainVBO, animModel, View, Projection);
+
+        particleTest.Update(DeltaTime, glm::vec2(0.0, -500.0), currentframe);
+        particleTest.Render(View, Projection);
 
         glfwSwapBuffers(window);
 

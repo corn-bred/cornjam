@@ -2,7 +2,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#define STB_IMAGE_IMPLEMENTATION
+
 #include <stb_image/stb_image.h>
 
 class TextureBuffer {
@@ -36,14 +36,37 @@ class TextureBuffer {
                 }
                 glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data); 
                 glGenerateMipmap(GL_TEXTURE_2D);
-            } else {std::cerr << "Texture failed to load" << std::endl; return;}
+            } else {
+                std::cerr << "Texture failed to load" << std::endl; 
+                glDeleteTextures(1, &texture); 
+                texture = 0; 
+                return;
+            }
             stbi_image_free(data);
         }
     }
+    
+    TextureBuffer() = default;
 
     ~TextureBuffer() {
         glDeleteTextures(1, &texture);
     }
+
+    TextureBuffer (TextureBuffer &&other) noexcept : texture(other.texture) {
+        other.texture = 0;
+    }
+
+    TextureBuffer &operator= (TextureBuffer &&other) noexcept {
+        if(this != &other) {
+            if (texture != 0) glDeleteTextures(1, &texture);
+            texture = other.texture;
+            other.texture = 0;
+        }
+        return *this;
+    }
+
+    TextureBuffer (TextureBuffer &other) = delete;
+    TextureBuffer &operator= (TextureBuffer &other) = delete;
 
     void bindTexture(unsigned int ID) {
         glActiveTexture(GL_TEXTURE0 + ID);

@@ -69,7 +69,8 @@ class Anim_SpriteRenderer {
         Rows = rows;
         Columns = columns;
     }
-    Anim_SpriteRenderer(TextureBuffer &sprite, int rows, int columns) : Sprite(sprite) {
+    Anim_SpriteRenderer(TextureBuffer &sprite, int rows, int columns) {
+        Sprite = std::move(sprite);
         Rows = rows;
         Columns = columns;
     }

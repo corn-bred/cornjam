@@ -6,6 +6,8 @@
 #include <glm/exponential.hpp>
 #include "collision.h"
 #include "grid.h"
+#include "inputmanager.h" 
+
 
 class Entity {
     protected:
@@ -141,5 +143,31 @@ class Player : public Entity {
         Matrix = glm::scale(Matrix, glm::vec3(ScaleLocal.x, ScaleLocal.y, 1.0));
         
         return Matrix;
+    }
+
+    void KeyboardUpdate (InputManager &input, float deltaTime) {
+        if (input.isActionPressed(Action::MoveLeft)) {
+            if (CollisionAxes[1] != 0)
+                Velocity.x += -Speed.x * (deltaTime * 60);
+            else {
+                Velocity.x += -Speed.x * (1 - (AirResistance.x / 2)) * (deltaTime * 60);
+            }
+        }
+
+        if (input.isActionPressed(Action::MoveRight)) {
+            if (CollisionAxes[1] != 0)
+                Velocity.x += Speed.x * (deltaTime * 60);
+            else
+                Velocity.x += Speed.x * (1 - (AirResistance.x / 2)) * (deltaTime * 60);
+        }
+
+        if (input.isActionPressedWithin(Action::Jump, 0.1f)) {
+            if (CollisionAxes[1] == -1)
+                Velocity.y = Speed.y;
+            else if (CollisionAxes[0] != 0 && CollisionAxes[1] == 0) { //To stop climb bugging
+                Velocity.y = Speed.y * MinijumpPushoff.y;
+                Velocity.x = TerminalSpeed.x * -CollisionAxes[0] * MinijumpPushoff[0];
+            }
+        }
     }
 };

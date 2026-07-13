@@ -23,6 +23,7 @@
 #include "spritesheet.h"
 #include "camera2D.h"
 #include "particles.h"
+#include "inputmanager.h"
 
 using namespace std;
 
@@ -38,38 +39,6 @@ void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
     WIDTH = width;
     HEIGHT = height;
     glViewport(0, 0, width, height);
-}
-
-void processInput(GLFWwindow *window) {
-    if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        if (mainPlayer.CollisionAxes[1] != 0)
-        mainPlayer.Velocity.x += -mainPlayer.Speed.x * (DeltaTime * 60);
-        else {
-        mainPlayer.Velocity.x += -mainPlayer.Speed.x * (1 - (mainPlayer.AirResistance.x / 2)) * (DeltaTime * 60);
-        }
-    }
-
-    if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        if (mainPlayer.CollisionAxes[1] != 0)
-        mainPlayer.Velocity.x += mainPlayer.Speed.x * (DeltaTime * 60);
-        else
-        mainPlayer.Velocity.x += mainPlayer.Speed.x * (1 - (mainPlayer.AirResistance.x / 2)) * (DeltaTime * 60);
-    }
-
-    if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        if (mainPlayer.CollisionAxes[1] == -1)
-        mainPlayer.Velocity.y = mainPlayer.Speed.y;
-        else if (mainPlayer.CollisionAxes[0] != 0 && mainPlayer.CollisionAxes[1] == 0) { //To stop climb bugging
-            mainPlayer.Velocity.y = mainPlayer.Speed.y * mainPlayer.MinijumpPushoff.y;
-            mainPlayer.Velocity.x = mainPlayer.TerminalSpeed.x * -mainPlayer.CollisionAxes[0] * mainPlayer.MinijumpPushoff[0];
-        }
-    }
-
-    if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        mainPlayer.Velocity.y = -mainPlayer.Speed.y;
-    }
-
-    
 }
 
 float LastX = -1.0, LastY = -1.0;
@@ -131,6 +100,11 @@ int main() {
 
     TextureBuffer playerTexture("res/goofy ahh thing.png");
 
+    InputManager playerInput(30.0, 0.1);
+    playerInput.BindAction(Action::Jump, GLFW_KEY_UP);
+    playerInput.BindAction(Action::MoveLeft, GLFW_KEY_LEFT);
+    playerInput.BindAction(Action::MoveRight, GLFW_KEY_RIGHT);
+
     GridSpace gridTest(glm::vec2(WIDTH/10, HEIGHT/10), glm::vec3(0.0));
 
     gridTest.Data = {
@@ -145,9 +119,11 @@ int main() {
 
     glm::vec2 OldDifference = glm::vec2(0.0);
 
-    Particles particleTest(50, glm::vec2(WIDTH / 2, HEIGHT / 2), 2.0, 10.0, 100.0, true, true);
+    Particles particleTest(67, glm::vec2(WIDTH / 2, HEIGHT / 2), 2.0, 10.0, 100.0, true, true);
 
     particleTest.RenderSolidColourState(glm::vec3(1.0, 0.8, 0.6));
+
+    
 
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -164,7 +140,8 @@ int main() {
         LastFrame = currentframe;
 
         glfwPollEvents();
-        processInput(window);
+        playerInput.Update(window, DeltaTime);
+        mainPlayer.KeyboardUpdate(playerInput, DeltaTime);
 
         //Camera updates
         glm::vec3 NewPos = cameraTest.CameraToEntity(mainPlayer, WIDTH, HEIGHT, lerpToTime(0.1, DeltaTime));
@@ -207,7 +184,7 @@ int main() {
         animModel = glm::scale(animModel, glm::vec3(100, 100, 0));
         CubeRotating.RenderSprite(mainShader, mainVBO, animModel, View, Projection);
 
-        particleTest.Update(DeltaTime, glm::vec2(0.0, -500.0), currentframe);
+        particleTest.Update(DeltaTime, glm::vec2(0.0, -100.0), currentframe);
         particleTest.Render(View, Projection);
 
         glfwSwapBuffers(window);

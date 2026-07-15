@@ -24,6 +24,7 @@
 #include "camera2D.h"
 #include "particles.h"
 #include "inputmanager.h"
+#include "bitmaptext.h"
 
 using namespace std;
 
@@ -119,11 +120,11 @@ int main() {
 
     glm::vec2 OldDifference = glm::vec2(0.0);
 
-    Particles particleTest(67, glm::vec2(WIDTH / 2, HEIGHT / 2), 2.0, 10.0, 100.0, true, true);
+    Particles particleTest(50, glm::vec2(WIDTH / 2, HEIGHT / 2), 2.0, 10.0, 100.0, true, true);
 
     particleTest.RenderSolidColourState(glm::vec3(1.0, 0.8, 0.6));
 
-    
+    TextRenderer text("res/arial.png", 8, 9, 72, 90, true);
 
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -186,6 +187,10 @@ int main() {
 
         particleTest.Update(DeltaTime, glm::vec2(0.0, -100.0), currentframe);
         particleTest.Render(View, Projection);
+
+        glm::mat4 TextView = glm::mat4(1.0);
+
+        text.RenderText("ABCDEFGHIJK", glm::vec2(0, HEIGHT - 90), 1.0, TextView, Projection);
 
         glfwSwapBuffers(window);
 

@@ -59,9 +59,11 @@ class VertexBuffer {
 
     void bind() {
         glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
     }
     
     void unbind() {
         glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 };

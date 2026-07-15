@@ -44,9 +44,9 @@ class Font {
     }
 
     const Glyph &GetGlyph(char c) const{
-        unsigned int index = static_cast<unsigned int> (c) - 65;
+        unsigned int index = static_cast<unsigned int> (c) - 33;
         if (index >= _Glyphs.size()) index = 0;
-        std::cout << index << " = " << c << std::endl;
+        //std::cout << index << " = " << c << std::endl;
         return _Glyphs[index];
     }
 };
@@ -77,16 +77,20 @@ class TextRenderer {
                 continue;
             }
 
+            if (c == ' ') {
+                DrawingPosition.x += GlyphScale.x * 1.0f;
+            }
+
             const Glyph &glyph = _Font.GetGlyph(c);
 
-            std::cout << glyph.TexOrigin.x << ", " << glyph.TexOrigin.y << std::endl;
-            std::cout << glyph.TexEnd.x << ", " << glyph.TexEnd.y << std::endl;
+            //std::cout << glyph.TexOrigin.x << ", " << glyph.TexOrigin.y << std::endl;
+            //std::cout << glyph.TexEnd.x << ", " << glyph.TexEnd.y << std::endl;
 
             glm::vec2 Origin = DrawingPosition;
             glm::vec2 OriginEnd = DrawingPosition + GlyphScale;
 
-            glm::vec2 TexCoord1 = glyph.TexOrigin;
-            glm::vec2 TexCoord2 = glyph.TexEnd;
+            glm::vec2 TexCoord1 = glm::vec2(glyph.TexOrigin.x, 1.0 - glyph.TexEnd.y);
+            glm::vec2 TexCoord2 = glm::vec2(glyph.TexEnd.x, 1.0 - glyph.TexOrigin.y);
 
             Vertices.push_back(Origin.x); Vertices.push_back(Origin.y);
             Vertices.push_back(TexCoord1.x); Vertices.push_back(TexCoord1.y);
@@ -106,7 +110,7 @@ class TextRenderer {
             Vertices.push_back(Origin.x); Vertices.push_back(OriginEnd.y);
             Vertices.push_back(TexCoord1.x); Vertices.push_back(TexCoord2.y);
 
-            DrawingPosition.x += GlyphScale.x * 1.1f;
+            DrawingPosition.x += GlyphScale.x * 1.0f;
         }
 
         _VBO.bind();

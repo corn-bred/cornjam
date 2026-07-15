@@ -7,5 +7,5 @@ out vec4 FragColour;
 
 void main() {
     vec4 TexColour = texture(FontTexture, iTexCoords);
-    FragColour = vec4(iTexCoords, 0.0, 1.0);
+    FragColour = TexColour;
 }

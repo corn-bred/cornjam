@@ -124,7 +124,7 @@ int main() {
 
     particleTest.RenderSolidColourState(glm::vec3(1.0, 0.8, 0.6));
 
-    TextRenderer text("res/arial.png", 8, 9, 72, 90, true);
+    TextRenderer text("res/sans-serif.png", 15, 15, 72, 90, true);
 
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -190,7 +190,7 @@ int main() {
 
         glm::mat4 TextView = glm::mat4(1.0);
 
-        text.RenderText("ABCDEFGHIJK", glm::vec2(0, HEIGHT - 90), 1.0, TextView, Projection);
+        text.RenderText("Test -=\\]{\n!@#$%^&*()", glm::vec2(0, HEIGHT - 90), 1.0, TextView, Projection);
 
         glfwSwapBuffers(window);
 

@@ -79,6 +79,7 @@ class TextRenderer {
 
             if (c == ' ') {
                 DrawingPosition.x += GlyphScale.x * 1.0f;
+                continue;
             }
 
             const Glyph &glyph = _Font.GetGlyph(c);

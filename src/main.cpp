@@ -1,7 +1,7 @@
+#include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image/stb_image.h>
@@ -11,6 +11,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp> 
+
+#include <AL/al.h>
+#include <AL/alc.h>
 
 #include <cornbreadlib/utility.h>
 #include <cornbreadlib/vertexbuffer.h>
@@ -52,6 +55,9 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 }
 
 int main() {
+    //Initialization
+
+    //GLFW & GLAD
     if (!glfwInit()) {
         cerr << "GLFW initialization failure\n";
         return 1;
@@ -93,13 +99,43 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    //OpenAL
+
+    ALCdevice *AudioDevice = alcOpenDevice(NULL);
+    if (!AudioDevice) {
+        cerr << "Audio device creation failure\n";
+        glfwTerminate();
+        return 1;
+    }
+
+    ALCcontext *AudioContext = alcCreateContext(AudioDevice, NULL);
+    if (!AudioContext) {
+        cerr << "Audio context creation failure\n";
+        glfwTerminate();
+        return 1;
+    }
+
+    alcMakeContextCurrent(AudioContext);
+
+    //OpenAL Listener position
+    alListener3f(AL_POSITION, 0.0, 0.0, 0.0);
+    alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+    alListener3f(AL_ORIENTATION, 0.0f, 0.0f, -1.0f);
+
+    ALuint SourceMain, AudioBuffer; //Source is where the sound comes from, and a buffer is the data of the audio
+
+    alGenBuffers(1, &AudioBuffer);
+    alGenSources(1, &SourceMain);
+
+
+
     VertexBuffer mainVBO(quadData, sizeof(quadData), GL_STATIC_DRAW);
     mainVBO.addAttribute(0, 2, GL_FLOAT, 4, 0);
     mainVBO.addAttribute(1, 2, GL_FLOAT, 4, 2);
 
     Shader mainShader("src/shaders/main.vert", "src/shaders/main.frag");
 
-    TextureBuffer playerTexture("res/goofy ahh thing.png");
+    TextureBuffer playerTexture("res/img/goofy ahh thing.png");
 
     InputManager playerInput(30.0, 0.1);
     playerInput.BindAction(Action::Jump, GLFW_KEY_UP);
@@ -114,7 +150,7 @@ int main() {
     10,0,10,1,10,2,10,3,10,4,10,5,10,6,10,7,10,8,10,9,10,10
     };
 
-    Animation CubeRotating(0, 49, 0.04167, true, "res/rotatingcube.png", 10, 5, GL_CLAMP_TO_BORDER,GL_CLAMP_TO_BORDER, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, false); // 1/24 is irrational
+    Animation CubeRotating(0, 49, 0.04167, true, "res/img/rotatingcube.png", 10, 5, GL_CLAMP_TO_BORDER,GL_CLAMP_TO_BORDER, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, false); // 1/24 is irrational
     
     Camera2D cameraTest(glm::vec3(0.0, 0.0, 0.0), glm::vec2(1.0), 0.0);
 
@@ -124,7 +160,7 @@ int main() {
 
     particleTest.RenderSolidColourState(glm::vec3(1.0, 0.8, 0.6));
 
-    TextRenderer text("res/sans-serif.png", 15, 15, 72, 90, true);
+    TextRenderer text("res/img/sans-serif.png", 15, 15, 72, 90, true);
 
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -196,6 +232,9 @@ int main() {
 
         FPSCounter++;
     }
+    alcMakeContextCurrent(0);
+    alcDestroyContext(AudioContext);
+    alcCloseDevice(AudioDevice);
     glfwTerminate();
     return 0;
 }

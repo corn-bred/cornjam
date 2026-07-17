@@ -20,6 +20,9 @@
 #include <cornbreadlib/shaders.h>
 #include <cornbreadlib/texturebuffer.h>
 
+#define DR_WAV_IMPLEMENTATION
+#include <dr_libs/dr_wav.h>
+
 #include "entity.h"
 #include "grid.h"
 #include "collision.h"
@@ -127,7 +130,48 @@ int main() {
     alGenBuffers(1, &AudioBuffer);
     alGenSources(1, &SourceMain);
 
+    //Get audio data
 
+    unsigned int Channels, SampleRate;
+    drwav_uint64 TotalPCMFrameCount;
+    drwav_int16 *SampleData = drwav_open_file_and_read_pcm_frames_s16("res/audio/laser_slam.wav", &Channels, &SampleRate, &TotalPCMFrameCount, NULL);
+    if (SampleData == NULL) {
+        cerr << "PCM frame read failure\n";
+        
+        alcMakeContextCurrent(0);
+        alcDestroyContext(AudioContext);
+        alcCloseDevice(AudioDevice);
+        glfwTerminate();
+
+        return 1;
+    }
+
+    //Get format
+    ALenum format;
+    if (Channels == 1) {
+        format = AL_FORMAT_MONO16;
+    } else if (Channels == 2) {
+        format = AL_FORMAT_STEREO16;
+    } else {
+        cerr << "OpenAL does not support more than 2 channels (Mono or Stereo) for playback\n";
+        
+        alcMakeContextCurrent(0);
+        alcDestroyContext(AudioContext);
+        alcCloseDevice(AudioDevice);
+        glfwTerminate();
+        drwav_free(SampleData, NULL);
+
+        return 1;
+    }
+    //Get size allocation
+    size_t TotalPCMByteCount = TotalPCMFrameCount * Channels * sizeof(drwav_int16);
+    //Add the data
+    alBufferData(AudioBuffer, format, SampleData, TotalPCMByteCount, SampleRate);
+    //Freeing memory
+    drwav_free(SampleData, NULL);
+
+    //Attach to the source
+    alSourcei(SourceMain, AL_BUFFER, AudioBuffer);
 
     VertexBuffer mainVBO(quadData, sizeof(quadData), GL_STATIC_DRAW);
     mainVBO.addAttribute(0, 2, GL_FLOAT, 4, 0);
@@ -173,6 +217,7 @@ int main() {
             titlestring << "Cornbread Program (FPS: " << FPSCounter << ")";
             glfwSetWindowTitle(window, titlestring.str().c_str()); 
             FPSCounter = 0;
+            alSourcePlay(SourceMain);
         }
         LastFrame = currentframe;
 

@@ -1,5 +1,7 @@
 #include <cornbreadlib/shaders.h>
 
+Shader::Shader() {} //if you do this without moving info in you die
+
 Shader::Shader(const char* vertexFilePath, const char* fragmentFilePath) {
     std::string vertexCode, fragmentCode;
     std::ifstream vertFile, fragFile;

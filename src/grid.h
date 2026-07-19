@@ -13,7 +13,7 @@ class GridSpace {
     glm::vec3 Origin;
     std::vector<int> Data;
 
-    GridSpace(glm::vec2 pixelResolution, glm::vec3 origin) {
+    GridSpace(glm::vec2 pixelResolution = glm::vec2(0.0), glm::vec3 origin = glm::vec3(0.0)) {
         GridRes = pixelResolution;
         Origin = origin;
     }

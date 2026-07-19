@@ -16,6 +16,7 @@ class Shader {
     GLuint ID;
     
     Shader(const char* vertexFilePath, const char* fragmentFilePath);
+    Shader();
 
     void use();
 

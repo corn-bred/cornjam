@@ -8,7 +8,7 @@ class VertexBuffer {
     GLuint VAO, VBO;
     GLsizeiptr size;
 
-    VertexBuffer(const void *Data, GLsizeiptr Size, GLenum drawtype) : size(Size) {
+    VertexBuffer(const void *Data = nullptr, GLsizeiptr Size = 0, GLenum drawtype = GL_STATIC_DRAW) : size(Size) {
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glBindVertexArray(VAO);

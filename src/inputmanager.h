@@ -10,6 +10,7 @@ enum class Action {
     MoveDown,
     MoveLeft,
     MoveRight,
+    Pause,
     Count
 };
 

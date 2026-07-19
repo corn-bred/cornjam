@@ -8,11 +8,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class AudioBuffer {
+class AudioData {
     public:
     ALuint ID;
     const char *AudioPath;
-    AudioBuffer(const char *audioPath) : AudioPath(audioPath) {
+    AudioData(const char *audioPath) : AudioPath(audioPath) {
         //Source is where the sound comes from, and a buffer is the data of the audio
         alGenBuffers(1, &ID);
 
@@ -51,27 +51,34 @@ class AudioBuffer {
         drwav_free(SampleData, NULL);
     }
 
-    void SetSourcePosition(glm::vec3 Position) {
-        alSource3f(ID, AL_POSITION, Position.x, Position.y, Position.z);
+    glm::vec3 Position = glm::vec3(0.0);
+    bool Looping = false;
+    float Pitch = 1.0;
+    float Gain = 1.0;
+    glm::vec3 Velocity = glm::vec3(0.0);
+    glm::vec3 NormalizedVec = glm::vec3(0.0);
+
+    void SetSourcePosition(glm::vec3 position) {
+        Position = position;
     }
 
-    void IsSourceLooping(bool Looping) {
-        alSourcei(ID, AL_LOOPING, Looping);
+    void IsSourceLooping(bool looping) {
+        Looping = looping;
     }
 
-    void SetSourcePitch(float Pitch) {
-        alSourcef(ID, AL_PITCH, Pitch);
+    void SetSourcePitch(float pitch) {
+        Pitch = pitch;
     }
 
-    void SetSourceGain(float Gain) {
-        alSourcef(ID, AL_GAIN, Gain);
+    void SetSourceGain(float gain) {
+        Gain = gain;
     }
 
-    void SetSourceVelocity(glm::vec3 Velocity) {
-        alSource3f(ID, AL_VELOCITY, Velocity.x, Velocity.y, Velocity.z);
+    void SetSourceVelocity(glm::vec3 velocity) {
+        Velocity = velocity;
     }
 
-    void SetSourceDirection(glm::vec3 NormalizedVec) {
-        alSource3f(ID, AL_DIRECTION, NormalizedVec.x, NormalizedVec.y, NormalizedVec.z);
+    void SetSourceDirection(glm::vec3 normalizedVec) {
+        NormalizedVec = normalizedVec;
     }
 };

@@ -9,7 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <cornbreadlib/audiobuffer.h>
+#include <cornbreadlib/audiodata.h>
 
 #define _SOURCESIZE 32
 
@@ -44,34 +44,6 @@ class AudioManager {
             ALuint src;
             alGenSources(1, &src);
             SourceAvailPool.push_back(src);
-        }
-    }
-
-    void PlaySound(AudioBuffer &buffer) {
-        if (SourceAvailPool.empty()) return;
-
-        ALuint src = SourceAvailPool.back();
-        SourceAvailPool.pop_back();
-
-        SourceUsedPool.push_back(src);
-
-        alSourcei(src, AL_BUFFER, buffer.ID);
-        alSourcePlay(src);
-    }
-
-    void Update() {
-        for (auto iterator = SourceUsedPool.begin(); iterator != SourceUsedPool.end();) {
-            ALuint src = *iterator; //give me the point
-            ALint SourceState;
-            alGetSourcei(src, AL_SOURCE_STATE, &SourceState);
-
-            if(SourceState == AL_STOPPED) {
-                SourceAvailPool.push_back(src);
-                iterator = SourceUsedPool.erase(iterator); //returns the next iterator that comes after the previously deleted iterator
-            } else {
-                iterator++;
-            }
-
         }
     }
 
@@ -114,6 +86,42 @@ class AudioManager {
 
     AudioManager(AudioManager &other) = delete;
     AudioManager operator=(AudioManager &other) = delete;
+
+    void PlaySound(AudioData &buffer) {
+        if (SourceAvailPool.empty()) return;
+
+        ALuint src = SourceAvailPool.back();
+        SourceAvailPool.pop_back();
+
+        SourceUsedPool.push_back(src);
+
+        alSourcei(src, AL_BUFFER, buffer.ID);
+
+        alSource3f(src, AL_POSITION, buffer.Position.x, buffer.Position.y, buffer.Position.z);
+        alSourcei(src, AL_LOOPING, buffer.Looping);
+        alSourcef(src, AL_PITCH, buffer.Pitch);
+        alSourcef(src, AL_GAIN, buffer.Gain);
+        alSource3f(src, AL_VELOCITY, buffer.Velocity.x, buffer.Velocity.y, buffer.Velocity.z);
+        alSource3f(src, AL_DIRECTION, buffer.NormalizedVec.x, buffer.NormalizedVec.y, buffer.NormalizedVec.z);
+        
+        alSourcePlay(src);
+    }
+
+    void Update() {
+        for (auto iterator = SourceUsedPool.begin(); iterator != SourceUsedPool.end();) {
+            ALuint src = *iterator; //give me the point
+            ALint SourceState;
+            alGetSourcei(src, AL_SOURCE_STATE, &SourceState);
+
+            if(SourceState == AL_STOPPED) {
+                SourceAvailPool.push_back(src);
+                iterator = SourceUsedPool.erase(iterator); //returns the next iterator that comes after the previously deleted iterator
+            } else {
+                iterator++;
+            }
+
+        }
+    }
 
     void SetListenerPosition(glm::vec3 Position) {
         alListener3f(AL_POSITION, Position.x, Position.y, Position.z);

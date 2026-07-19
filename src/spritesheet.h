@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/exponential.hpp>
+#include "globals.h"
 
 class Anim_FrameHandler {
     private:
@@ -111,8 +112,8 @@ class Animation {
         SpriteRenderer.RenderSprite(shader, VBO, Model, View, Projection, FrameHandler.GetFrame());
     }
 
-    void Update(float currentTime, float deltaTime) {
-        FrameHandler.UpdateFrame(currentTime, deltaTime);
+    void Update() {
+        FrameHandler.UpdateFrame(CurrentTime, DeltaTime);
     }
     
     void ResetAnimation() {

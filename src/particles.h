@@ -11,6 +11,7 @@
 #include <time.h>
 
 #include "spritesheet.h"
+#include "globals.h"
 
 #define PI 3.14159265358979323846
 
@@ -56,7 +57,7 @@ class Particles {
     public:
     const int ParticleNum = 0;
 
-    Particles(int particleNum, glm::vec2 origin, float maxDuration, float size, float speed, bool hasGravity, bool isLooping) : mainCompute("src/shaders/particles.comp"), Renderer("src/shaders/particles.vert", "src/shaders/particles.frag"), ParticleNum(particleNum), SSBO(nullptr, 0, GL_DYNAMIC_DRAW), DummyVBO(nullptr, 0, GL_STATIC_DRAW) {
+    Particles(const char *computePath, int particleNum, glm::vec2 origin, float maxDuration, float size, float speed, bool hasGravity, bool isLooping) : mainCompute(computePath), Renderer("src/shaders/particles.vert", "src/shaders/particles.frag"), ParticleNum(particleNum), SSBO(nullptr, 0, GL_DYNAMIC_DRAW), DummyVBO(nullptr, 0, GL_STATIC_DRAW) {
         std::vector<Particle> particles(ParticleNum);
 
         for (int i = 0; i < ParticleNum; i++) {
@@ -83,12 +84,50 @@ class Particles {
         SSBO.bindToShader(0);
     }
 
-    void Update(float deltaTime, glm::vec2 gravity, float currentTime) {
+    //BRUHH deconstructor is TECHNICALLY custom because of the variables inside
+
+    Particles(Particles&& other) noexcept :
+        mainCompute(std::move(other.mainCompute)),
+        Renderer(std::move(other.Renderer)),
+        SSBO(std::move(other.SSBO)),
+        DummyVBO(std::move(other.DummyVBO)),
+        Texture(other.Texture),
+        Spritesheet(other.Spritesheet),
+        RenderingType(other.RenderingType),
+        SolidColour(other.SolidColour) {
+        
+        other.Texture = nullptr;
+        other.Spritesheet = nullptr;
+    } //do allat
+
+    Particles& operator=(Particles&& other) noexcept {
+        if (this != &other) {
+            // move assignment
+            mainCompute = std::move(other.mainCompute);
+            Renderer = std::move(other.Renderer);
+            SSBO = std::move(other.SSBO);
+            DummyVBO = std::move(other.DummyVBO);
+            
+            // move all the pointer classes and stuff
+            Texture = other.Texture;
+            Spritesheet = other.Spritesheet;
+            
+            RenderingType = other.RenderingType;
+            SolidColour = other.SolidColour;
+            
+            // then destroy
+            other.Texture = nullptr;
+            other.Spritesheet = nullptr;
+        }
+        return *this;
+    }
+
+    void Update(glm::vec2 gravity) {
         mainCompute.bind();
         
-        mainCompute.setFloat("uDeltaTime", deltaTime);
+        mainCompute.setFloat("uDeltaTime", DeltaTime);
         mainCompute.setVec2("uGravity", gravity);
-        mainCompute.setFloat("uCurrentTime", currentTime);
+        mainCompute.setFloat("uCurrentTime", CurrentTime);
 
         mainCompute.use((ParticleNum + 255) / 256, 1, 1, GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
     }

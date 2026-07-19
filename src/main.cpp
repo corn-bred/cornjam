@@ -31,12 +31,13 @@
 #include "particles.h"
 #include "inputmanager.h"
 #include "bitmaptext.h"
+#include "globals.h"
 
 using namespace std;
 
 int WIDTH = 1200;
 int HEIGHT = 800;
-double DeltaTime, LastFrame;
+double DeltaTime, LastTime;
 unsigned int FPSCounter, ShownFPS;
 int FrameIndex = 0;
 
@@ -200,26 +201,28 @@ int main() {
 
     glm::vec2 OldDifference = glm::vec2(0.0);
 
-    Particles particleTest(50, glm::vec2(WIDTH / 2, HEIGHT / 2), 2.0, 10.0, 100.0, true, true);
+    Particles particleTest("src/shaders/particles.comp", 50, glm::vec2(WIDTH / 2, HEIGHT / 2), 2.0, 10.0, 100.0, true, true);
 
     particleTest.RenderSolidColourState(glm::vec3(1.0, 0.8, 0.6));
 
     TextRenderer text("res/img/sans-serif.png", 15, 15, 72, 90, true);
 
+    glm::mat4 Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -100.0f, 100.0f);
+
     while(!glfwWindowShouldClose(window)) { 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        double currentframe = glfwGetTime();
-        DeltaTime = currentframe - LastFrame;
-        if (floor(currentframe) != floor(LastFrame)) {
+        double CurrentTime = glfwGetTime();
+        DeltaTime = CurrentTime - LastTime;
+        if (floor(CurrentTime) != floor(LastTime)) {
             stringstream titlestring;
             titlestring << "Cornbread Program (FPS: " << FPSCounter << ")";
             glfwSetWindowTitle(window, titlestring.str().c_str()); 
             FPSCounter = 0;
             alSourcePlay(SourceMain);
         }
-        LastFrame = currentframe;
+        LastTime = CurrentTime;
 
         glfwPollEvents();
         playerInput.Update(window, DeltaTime);
@@ -260,13 +263,13 @@ int main() {
 
         gridTest.RenderAll(mainShader, mainVBO, View, Projection);
 
-        CubeRotating.Update(currentframe, DeltaTime);
+        CubeRotating.Update(CurrentTime, DeltaTime);
 
         glm::mat4 animModel = glm::mat4(1.0);
         animModel = glm::scale(animModel, glm::vec3(100, 100, 0));
         CubeRotating.RenderSprite(mainShader, mainVBO, animModel, View, Projection);
 
-        particleTest.Update(DeltaTime, glm::vec2(0.0, -100.0), currentframe);
+        particleTest.Update(DeltaTime, glm::vec2(0.0, -100.0), CurrentTime);
         particleTest.Render(View, Projection);
 
         glm::mat4 TextView = glm::mat4(1.0);

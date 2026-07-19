@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <memory>
 
+#include "globals.h"
+
 enum class Action {
     Jump,
     MoveUp,
@@ -25,7 +27,7 @@ class InputManager {
         }
     }
 
-    void Update(GLFWwindow *window, float deltaTime) {
+    void Update(GLFWwindow *window) {
 
         for(int i = 0; i <= GLFW_KEY_LAST; i++) {
             int isKeyPressed = glfwGetKey(window, i);
@@ -33,9 +35,9 @@ class InputManager {
             if(isKeyPressed == GLFW_PRESS) { //POSITIVE
 
                 if (_KeyTimer[i] > 0) //Was it already pressed in the previous frame?
-                    _KeyTimer[i] += deltaTime;
+                    _KeyTimer[i] += DeltaTime;
                 else
-                    _KeyTimer[i] = deltaTime;
+                    _KeyTimer[i] = DeltaTime;
 
                 if (_KeyTimer[i] > c_MaximumTime)
                     _KeyTimer[i] = c_MaximumTime;
@@ -43,9 +45,9 @@ class InputManager {
             } else { //NEGATIVE
 
                 if (_KeyTimer[i] < 0) //Was it already released in the previous frame?
-                    _KeyTimer[i] -= deltaTime;
+                    _KeyTimer[i] -= DeltaTime;
                 else
-                    _KeyTimer[i] = -deltaTime;
+                    _KeyTimer[i] = -DeltaTime;
 
                 if (_KeyTimer[i] < c_MaximumTime)
                     _KeyTimer[i] = -c_MaximumTime;

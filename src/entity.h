@@ -7,6 +7,7 @@
 #include "collision.h"
 #include "grid.h"
 #include "inputmanager.h" 
+#include "globals.h"
 
 
 class Entity {
@@ -54,14 +55,14 @@ class Player : public Entity {
         WallStickStrength = wallStickStrength;
     }
 
-    void VeloUpdate(double deltaTime, GridSpace &grid, int searchRadius, float gravity) { //If anything is farther than searchRadius, discard it from collision testing.
+    void VeloUpdate(GridSpace &grid, int searchRadius, float gravity) { //If anything is farther than searchRadius, discard it from collision testing.
         //First, clamp the velocities
         Velocity.x = glm::clamp(Velocity.x, -TerminalSpeed.x, TerminalSpeed.x);
 
         
         CollisionAxes[0] = 0;
 
-        Position.x += Velocity.x * (float)(deltaTime);
+        Position.x += Velocity.x * (float)(DeltaTime);
         Hitbox.Origin.x = Position.x;
 
         for(int i = 0; i < floor(grid.Data.size() / 2); i++) { //Cycling through each piece of data, inefficient but works for now
@@ -89,7 +90,7 @@ class Player : public Entity {
 
         CollisionAxes[1] = 0;
 
-        Position.y += Velocity.y * (float)(deltaTime);
+        Position.y += Velocity.y * (float)(DeltaTime);
         Hitbox.Origin.y = Position.y;
 
         for(int i = 0; i < floor(grid.Data.size() / 2); i++) { //Cycling through each piece of data, inefficient but works for now
@@ -117,17 +118,17 @@ class Player : public Entity {
 
         //Update velocities for next loop
         if(CollisionAxes[1] != 0) {
-            Velocity.x = Velocity.x * glm::pow(Resistance.x, deltaTime * 60);
+            Velocity.x = Velocity.x * glm::pow(Resistance.x, DeltaTime * 60);
         } else {
-            Velocity.x = Velocity.x * glm::pow(0.99, deltaTime * 60);
+            Velocity.x = Velocity.x * glm::pow(0.99, DeltaTime * 60);
         }
         
         //Velocity.y = Velocity.y * glm::pow(Resistance.y, deltaTime * 60);
 
         if (CollisionAxes[0] != 0 && CollisionAxes[1] == 0) {
-            Velocity.y = glm::clamp( float(Velocity.y - (gravity * deltaTime)), -gravity / (Speed.x * WallStickStrength), gravity / (Speed.x * WallStickStrength));
+            Velocity.y = glm::clamp( float(Velocity.y - (gravity * DeltaTime)), -gravity / (Speed.x * WallStickStrength), gravity / (Speed.x * WallStickStrength));
         } else {
-            Velocity.y = Velocity.y - (gravity * deltaTime);
+            Velocity.y = Velocity.y - (gravity * DeltaTime);
         }
         
         //std::cout << Position.x << ", " << Position.y << " : ";
@@ -145,20 +146,20 @@ class Player : public Entity {
         return Matrix;
     }
 
-    void KeyboardUpdate (InputManager &input, float deltaTime) {
+    void KeyboardUpdate (InputManager &input) {
         if (input.isActionPressed(Action::MoveLeft)) {
             if (CollisionAxes[1] != 0)
-                Velocity.x += -Speed.x * (deltaTime * 60);
+                Velocity.x += -Speed.x * (DeltaTime * 60);
             else {
-                Velocity.x += -Speed.x * (1 - (AirResistance.x / 2)) * (deltaTime * 60);
+                Velocity.x += -Speed.x * (1 - (AirResistance.x / 2)) * (DeltaTime * 60);
             }
         }
 
         if (input.isActionPressed(Action::MoveRight)) {
             if (CollisionAxes[1] != 0)
-                Velocity.x += Speed.x * (deltaTime * 60);
+                Velocity.x += Speed.x * (DeltaTime * 60);
             else
-                Velocity.x += Speed.x * (1 - (AirResistance.x / 2)) * (deltaTime * 60);
+                Velocity.x += Speed.x * (1 - (AirResistance.x / 2)) * (DeltaTime * 60);
         }
 
         if (input.isActionPressedWithin(Action::Jump, 0.1f)) {

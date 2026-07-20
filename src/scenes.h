@@ -44,28 +44,7 @@ class Scene {
 
 //Custom scenes written below
 
-class PausedScene : public Scene {
-    TextRenderer *text;
-    public:
-    void Init() override;
-    void Update() override;
-    void Render() override;
-    void Exit() override;
-};
-
 class PlayingScene : public Scene {
-    Player* mainPlayer;
-    VertexBuffer* mainVBO;
-    Shader* mainShader;
-    TextureBuffer* playerTexture;
-    GridSpace* WorldGrid;
-    Animation* CubeRotating;
-    Camera2D* mainCamera;
-    Particles* particleTest;
-    TextRenderer* text;
-
-    glm::vec2 OldDifference;
-
     public:
 
     void Init() override;

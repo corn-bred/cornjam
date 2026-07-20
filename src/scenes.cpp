@@ -1,7 +1,7 @@
 #include "scenes.h"
 #include "game.h"          
-#include "inputmanager.h"  
-#include "globals.h"
+#include <cornjam/inputmanager.h>  
+#include <misc/globals.h>
 
 //PlayingScene
 

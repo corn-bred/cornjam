@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <memory>
 
-#include "globals.h"
+#include <misc/globals.h>
 
 enum class Action {
     Jump,

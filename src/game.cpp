@@ -1,7 +1,7 @@
 #include "game.h"
 #include "scenes.h"
-#include "globals.h"
-#include "inputmanager.h"
+#include <misc/globals.h>
+#include <cornjam/inputmanager.h>
 #include <cornbreadlib/audiomanager.h>
 
 void GameState::ChangeScene(Scene *newScene) {

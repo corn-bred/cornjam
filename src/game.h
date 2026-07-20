@@ -1,6 +1,6 @@
 #pragma once
 #include "scenes.h"
-#include "globals.h"
+#include <misc/globals.h>
 #include <memory>
 
 class GameState {

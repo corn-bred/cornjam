@@ -11,7 +11,7 @@
 #include <time.h>
 
 #include "spritesheet.h"
-#include "globals.h"
+#include <misc/globals.h>
 
 #define PI 3.14159265358979323846
 

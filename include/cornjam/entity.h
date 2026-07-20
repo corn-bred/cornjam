@@ -4,10 +4,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/exponential.hpp>
-#include "collision.h"
-#include "grid.h"
-#include "inputmanager.h" 
-#include "globals.h"
+#include <cornjam/collision.h>
+#include <cornjam/grid.h>
+#include <cornjam/inputmanager.h>
+#include <misc/globals.h>
 
 
 class Entity {

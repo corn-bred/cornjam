@@ -20,15 +20,15 @@
 
 #include <dr_libs/dr_wav.h>
 
-#include "entity.h"
-#include "grid.h"
-#include "collision.h"
-#include "spritesheet.h"
-#include "camera2D.h"
-#include "particles.h"
-#include "inputmanager.h"
-#include "bitmaptext.h"
-#include "globals.h"
+#include <cornjam/entity.h>
+#include <cornjam/grid.h>
+#include <cornjam/collision.h>
+#include <cornjam/spritesheet.h>
+#include <cornjam/camera2D.h>
+#include <cornjam/particles.h>
+#include <cornjam/inputmanager.h>
+#include <cornjam/bitmaptext.h>
+#include <misc/globals.h>
 class Scene {
     public:
     virtual ~Scene() = default;

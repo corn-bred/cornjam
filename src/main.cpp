@@ -23,9 +23,9 @@
 #define DR_WAV_IMPLEMENTATION
 #include <dr_libs/dr_wav.h>
 
-#include "globals.h"
+#include <misc/globals.h>
 #include "game.h"
-#include "inputmanager.h"
+#include <cornjam/inputmanager.h>
 #include <cornbreadlib/audiomanager.h>
 
 using namespace std;

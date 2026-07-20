@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/exponential.hpp>
-#include "entity.h"
+#include <cornjam/entity.h>
 
 class Camera2D {
     private:

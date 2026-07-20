@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/exponential.hpp>
-#include "globals.h"
+#include <misc/globals.h>
 
 class Anim_FrameHandler {
     private:

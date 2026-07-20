@@ -1,6 +1,6 @@
-#include "globals.h"
+#include <misc/globals.h>
 #include "game.h"
-#include "inputmanager.h"
+#include <cornjam/inputmanager.h>
 #include <cornbreadlib/audiomanager.h>
 #include <glm/gtc/matrix_transform.hpp>
 

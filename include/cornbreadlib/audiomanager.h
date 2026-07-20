@@ -103,7 +103,7 @@ class AudioManager {
         alSourcef(src, AL_GAIN, buffer.Gain);
         alSource3f(src, AL_VELOCITY, buffer.Velocity.x, buffer.Velocity.y, buffer.Velocity.z);
         alSource3f(src, AL_DIRECTION, buffer.NormalizedVec.x, buffer.NormalizedVec.y, buffer.NormalizedVec.z);
-        
+
         alSourcePlay(src);
     }
 

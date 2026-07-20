@@ -2,9 +2,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "game.h"
-#include "inputmanager.h"
-#include <cornbreadlib/audiomanager.h>
+
+class GameState;
+class InputManager;
+class AudioManager;
 
 extern int WIDTH, HEIGHT;
 extern double CurrentTime, DeltaTime;

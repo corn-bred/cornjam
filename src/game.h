@@ -12,39 +12,11 @@ class GameState {
 
     public:
 
-    void ChangeScene(Scene *newScene) {
-        PendingScene.reset(newScene); //new ownershippp
-    }
+    void ChangeScene(Scene *newScene);
 
-    void ApplyPendingScene() {
-        if (PendingScene) {
-            if (CurrentScene) CurrentScene->Exit();
+    void ApplyPendingScene();
 
-            CurrentScene = std::move(PendingScene);
+    void Init();
 
-            if (CurrentScene) CurrentScene->Init();
-        }
-    }
-
-    void Init() {
-        ChangeScene(new PlayingScene());
-    }
-
-    void Play(GLFWwindow *window) {
-        audio.Update();
-        input.Update();
-        
-        ApplyPendingScene();
-
-        if (CurrentScene) {
-            CurrentScene->Update();
-        }
-
-        if (CurrentScene) {
-            CurrentScene->Render();
-        }
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+    void Play(GLFWwindow *window);
 };

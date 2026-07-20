@@ -23,13 +23,17 @@
 #define DR_WAV_IMPLEMENTATION
 #include <dr_libs/dr_wav.h>
 
+#include "globals.h"
 #include "game.h"
+#include "inputmanager.h"
+#include <cornbreadlib/audiomanager.h>
 
 using namespace std;
 
 int WIDTH = 1200;
 int HEIGHT = 800;
-double DeltaTime, LastTime;
+double CurrentTime = 0.0;
+double DeltaTime = 0.0, LastTime;
 unsigned int FPSCounter, ShownFPS;
 int FrameIndex = 0;
 
@@ -92,13 +96,6 @@ int main() {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    InputManager input(60.0, 1.0 / 60);
-    AudioManager audio;
-
-    glm::mat4 Projection = glm::ortho(0.0f, (float)WIDTH, 0.0f, (float)HEIGHT, -100.0f, 100.0f);
-
-    GameState game;
 
     game.Init();
 
